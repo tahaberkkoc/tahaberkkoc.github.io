@@ -1,0 +1,98 @@
+% =====================================================================
+%  portfolio.sty — the commands used by the website content files.
+%
+%  The website build reads these commands directly from the .tex files.
+%  This package only exists so that the very same files also compile in
+%  LaTeX / Overleaf (see main.tex) and give you a tidy PDF preview.
+%  You normally don't need to edit this file.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{portfolio}[2026/10/23 Portfolio website content macros]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{enumitem}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{amsmath,amssymb}
+
+\definecolor{pfblue}{HTML}{0A66C2}
+\definecolor{pfgray}{HTML}{545454}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% --------------------------------------------------------------- site.tex
+\newcommand{\SiteName}[1]{{\LARGE\bfseries #1}\par\medskip}
+\newcommand{\SiteTitle}[1]{}
+\newcommand{\SiteDescription}[1]{{\itshape #1}\par}
+\newcommand{\SiteLanguage}[1]{}
+\newcommand{\Nav}[3][]{}                       % \Nav[color]{key}{Label}
+\newcommand{\Social}[3]{\textbf{#1:} \href{#2}{#3}\par} % \Social{icon}{url}{label}
+\newcommand{\FooterText}[1]{}
+
+% ----------------------------------------------------------- page commands
+\newcommand{\PageTitle}[2][]{\section*{#2}}    % \PageTitle[color]{Title}
+\newenvironment{Intro}{\par}{\par}
+\newcommand{\Label}[2]{}                       % \Label{key}{text} (small UI texts)
+
+% --------------------------------------------------------------- home.tex
+\newcommand{\Greeting}[1]{{\Huge\bfseries #1}\par\medskip}
+\newcommand{\Photo}[2][]{\IfFileExists{#2}{\includegraphics[width=5cm]{#2}\par}{}}
+\newenvironment{About}{\par}{\par}
+
+% --------------------------------------------------------- background.tex
+% \Section[color]{Title}
+\newcommand{\Section}[2][]{\section*{#2}}
+% \Entry[link]{Title}{Date}{Location}{Note}
+\newcommand{\Entry}[5][]{%
+  \par\medskip\noindent{\color{pfblue}\bfseries #2}\hfill{\itshape\color{pfgray}#3}\par
+  \noindent{\small\color{pfgray}#4}\hfill{\small\itshape #5}\par}
+\newcommand{\Role}[1]{\noindent{\small\itshape #1}\par}
+% \Position[link]{Position}{Date}{Organization}{Place}  (position on top, organization below)
+\newcommand{\Position}[5][]{%
+  \par\medskip\noindent{\color{pfblue}\bfseries #2}\hfill{\itshape\color{pfgray}#3}\par
+  \noindent{\small\itshape #4}\hfill{\small\color{pfgray}#5}\par}
+% \Also{Position}{Date}  another position at the same organization
+\newcommand{\Also}[2]{\par\smallskip\noindent{\small\bfseries\itshape #1}\hfill{\small\itshape\color{pfgray}#2}\par}
+\newenvironment{Highlights}{\begin{itemize}[leftmargin=1.5em,itemsep=1pt,topsep=2pt]\small}{\end{itemize}}
+% \SkillGroup{Group name}{item 1, item 2, item 3}
+\newcommand{\SkillGroup}[2]{\noindent\if\relax\detokenize{#1}\relax\else\textbf{#1:} \fi #2\par}
+
+% ---------------------------------------------------------- interests.tex
+% \Interest[icon]{Title}{Subtitle}{Description}
+% \Download{path}{label}  (Background page: download button)
+\newcommand{\Download}[2]{}
+% \GalleryImage[wide|tall|big]{path}{caption}
+\newcommand{\GalleryImage}[3][]{}
+\newcommand{\Interest}[4][]{\paragraph{#2}{\itshape #3}. #4\par}
+
+% ------------------------------------------------------------ contact.tex
+\newcommand{\FormTitle}[1]{\subsection*{#1}}
+\newcommand{\FormField}[4][]{}                 % \FormField[type]{name}{Label}{Placeholder}
+\newcommand{\FormButton}[1]{}
+\newcommand{\FormNote}[1]{}
+\newcommand{\FormEndpoint}[1]{}
+\newcommand{\FormAccessKey}[1]{}
+\newcommand{\FormSent}[1]{}
+\newcommand{\FormError}[1]{}
+
+% ----------------------------------------------------- projects/*/project.tex
+\newcommand{\ProjectTitle}[1]{\subsection*{#1}}
+\newcommand{\ProjectDate}[1]{{\itshape\color{pfgray}#1}\par}
+\newcommand{\ProjectOrder}[1]{}
+\newcommand{\ProjectCategory}[1]{}
+\newcommand{\Category}[3][]{}
+\newcommand{\ProjectTags}[1]{{\small Tags: #1}\par}
+\newcommand{\ProjectCover}[1]{}
+\newcommand{\ProjectLink}[2]{\href{#2}{#1}\quad}
+\newcommand{\ProjectDocument}[1]{}
+\newcommand{\ProjectAuthors}[1]{}
+\newcommand{\ProjectStatus}[1]{}
+\newcommand{\ProjectSupervisor}[2]{}
+\newcommand{\ProjectSkipTitlePage}{}
+\newcommand{\ProjectAbstractFirst}{}
+\newcommand{\ProjectHidden}{}
+\newenvironment{ProjectSummary}{\par}{\par}
+
+\endinput

@@ -1,0 +1,23 @@
+% Web version of Thesis.tex: same chapters, without the memoir page layout.
+% When you add a chapter in Thesis.tex, add its \include line here as well.
+\documentclass{report}
+\begin{document}
+
+\frontmatter
+\include{frontmatter/Summary}
+\include{frontmatter/Acknowledgements}
+
+\mainmatter
+\include{chapters/Introduction}
+\include{chapters/LTI_System}
+\include{chapters/Bilinear_System}
+\include{chapters/Stochastic_System}
+\include{chapters/Stochastic_Bilinear_System}
+\include{chapters/State_Input_Analysis}
+\include{chapters/Kalman_Filtering}
+\include{chapters/District_Heating_System}
+\include{chapters/Conclusion}
+
+\include{appendices/AnAppendix}
+
+\end{document}

@@ -1,0 +1,316 @@
+% Rewritten from the supplied LaTeX source.
+% Keep the original figs/ directory alongside this .tex file in Overleaf.
+% Existing image paths, configuration names and source-code identifiers are intentionally unchanged.
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{lmodern.sty}{\usepackage{lmodern}}{}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs,array,tabularx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlength{\emergencystretch}{3em}
+\newcommand{\NSA}{Non Stop Align}
+\newcommand{\imagefigure}[2]{%
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth,height=0.40\textheight,keepaspectratio]{#1}
+    \caption{#2}
+  \end{figure}
+}
+\title{Conformal Prediction-Based MPC for Haptic Human Guidance}
+\author{}
+\date{October 20, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This work investigates navigation guidance through a haptic vest when a person cannot visually follow the route. Human reactions to tactile cues are delayed and vary across individuals, which makes accurate and safe trajectory prediction challenging. We combine a plan-conditioned LSTM predictor, conformal prediction regions, and model predictive control (MPC) to select guidance cues while accounting for motion uncertainty. Online recursive least squares (RLS) and linear quantile tracking (LQT) adapt the predictions and uncertainty regions to the individual. The same framework is examined with two interaction strategies, Hybrid and \NSA, using simulation-based experiments as preparation for future human trials.
+\end{abstract}
+\tableofcontents
+\clearpage
+
+% ----------------------------------------------------------
+\section{Overview}
+\label{sec:overview}
+
+\subsection*{Problem}
+We consider a person navigating a corridor with obstacles using only the signals of a haptic vest. The system must guide the person toward a destination without assuming that a signal produces an immediate or perfectly repeatable movement. Reaction delays, turning variability, individual preferences, and occasional misinterpretations create uncertainty in the person's future position. A guidance method based only on a single predicted trajectory may therefore select an unsafe maneuver.
+
+\subsection*{Proposed Solution}
+Our approach uses data from previous human-response surveys to initialise a simulator and generate synthetic walking trajectories. These trajectories provide the initial training distribution; they are not assumed to describe every real participant exactly. A plan-conditioned LSTM predicts the motion that may follow a candidate sequence of vest cues. Conformal prediction quantifies the prediction error as a region around the trajectory. MPC compares candidate cue sequences using both route-following performance and the separation of these regions from obstacles. Finally, RLS corrects the predictor and LQT adjusts the region size as observations from the individual become available.
+
+The framework is evaluated with two guidance strategies:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}p{0.20\linewidth}XX@{}}
+\toprule
+ & \textbf{Hybrid} & \textbf{\NSA} \\
+\midrule
+Vest cue & Discrete left, forward, right, Stop and Continous alignment direction cues & Continuously indicates the direction of a selected target location \\
+Human response & Makes a finite turn after a cue; may stop and turn in place & Continues walking and adjusts heading toward the indicated direction \\
+MPC action & Selects a short cue sequence & Selects or maintains a target location \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Both strategies use the same prediction, uncertainty estimation, planning, and online adaptation principles. Their main difference is the way a guidance instruction is communicated and interpreted.
+
+\imagefigure{figs/b0_block.png}{Overall framework. Synthetic data support offline predictor training and conformal calibration. During navigation, MPC evaluates possible vest cues while RLS and LQT adapt the prediction model and uncertainty regions.}
+
+In the simulation figures, the person is represented by a blue disc and heading line; dark discs are obstacles and red dotted boundaries include the person radius and safety margin. Predicted trajectories are surrounded by conformal ellipses, generally shown at 3, 6, and 9 seconds. The following sections present the common methodology, the two guidance strategies, and the simulation findings. The experiments are a preliminary evaluation; they do not replace tests with real participants.
+
+% ----------------------------------------------------------
+\section{General Theory}
+\label{sec:method}
+
+The proposed controller follows a repeated process: predict how the person would respond to possible cues, represent uncertainty around each prediction, choose a route-following action that avoids risk where possible, and update the model using the observed response. This section explains the main theoretical elements without repeating implementation details for each strategy.
+
+\subsection{Human-motion prediction with a plan-conditioned LSTM}
+\label{sec:lstm}
+
+A useful predictor must answer more than ``where will the person go?'' It must estimate \emph{where the person will go if a particular sequence of cues is delivered}. We use a causal encoder to summarise recent motion and an autoregressive LSTM decoder to predict successive changes in position and heading. Each future frame is conditioned on the cue assigned to its planning interval.
+
+\begin{align}
+ h_0 &= \operatorname{Enc}(\text{past motion}),\\
+ (h_{k+1},c_{k+1}) &= \operatorname{LSTMCell}
+ \bigl([s_{j(k)},\,\mathrm{ctx},\,o_k],(h_k,c_k)\bigr),\\
+ o_k &= Wh_{k+1}+b.
+\end{align}
+
+Here $s_{j(k)}$ represents the planned vest instruction active at future frame $k$. The network predicts motion increments, which are integrated to produce a continuous trajectory:
+\begin{align}
+ \hat\psi_{k+1}&=\hat\psi_k+\Delta\hat\psi_k,\\
+ \hat p_{k+1}&=\hat p_k+R(\hat\psi_k)\Delta\hat p_k,\\
+ o_k&=(\Delta\hat p_k,\Delta\hat\psi_k).
+\end{align}
+
+The present planner uses three 3-second steps, giving a 9-second prediction horizon. The decoder carries its internal state between steps, allowing later predictions to depend on the response to earlier cues. Only the final linear layer is adjusted by RLS during online adaptation.
+
+\subsection{Conformal Prediction for Motion uncertainty}
+\label{sec:conformal}
+
+A predicted path is not sufficient for risk-aware planning: the controller also needs an estimate of how much the realised path may differ. Conformal prediction uses prediction errors on held-out calibration trajectories to construct uncertainty regions without assuming a particular distribution for those errors. Under the required exchangeability assumptions, it provides finite-sample coverage for a new trajectory window.
+
+For each calibration window, let $e_k=p_k-\hat p_k$ denote the position error and $\Sigma_k$ a covariance estimate obtained from the training errors. We measure the largest normalised error across the window:
+\begin{equation}
+ M_k=\sqrt{e_k^\top\Sigma_k^{-1}e_k},
+ \qquad R=\max_{k=1,\ldots,HK}M_k.
+\end{equation}
+
+\imagefigure{figs/c1_score.png}{Conformal score of a prediction window. Position errors are normalised by the estimated covariance, and the largest error over the predicted path defines the window score.}
+
+If the calibration set contains $n$ scores, the threshold $C$ is chosen as the corresponding upper empirical quantile:
+\begin{equation}
+ C=R_{\left(\left\lceil(n+1)(1-\bar\delta)\right\rceil\right)},
+ \qquad \Pr(R_{\mathrm{new}}\le C)\ge 1-\bar\delta.
+\end{equation}
+
+The reported experiments use a nominal miscoverage level $\bar\delta=0.10$. A mission-level allocation may be expressed as $\bar\delta=\delta/T_{\mathrm{mission}}$ when a mission-wide error budget is specified.
+
+\imagefigure{figs/c2_quantile.png}{Calibration threshold and test example. The empirical distribution of scores determines the conformal threshold, which then scales the position-error ellipses.}
+
+At each future step the region around the predicted position is
+\begin{equation}
+ E_k=\left\{x:(x-\hat p_k)^\top Q_k^{-1}(x-\hat p_k)\le1\right\},
+ \qquad Q_k=(qC)^2\Sigma_k.
+\end{equation}
+
+The covariance describes the shape of the region, $C$ provides the calibrated scale, and $q$ allows online adjustment. We use \emph{Mondrian} calibration: different cue sequences and response contexts have separate calibration groups, with fallback to broader groups when fewer than 200 samples are available. This avoids forcing the same uncertainty region on straight walking, turning, and standing. Once the predictor or $q$ is modified online, the original offline coverage result should not automatically be interpreted as a new finite-sample guarantee; online coverage is measured separately.
+
+\subsection{Risk-aware Model Predictive Control}
+\label{sec:mpc}
+
+At each decision, MPC evaluates candidate cue sequences using the LSTM and their conformal regions. The controller is executed every 0.5 seconds, but a new cue is normally subject to a 3-second minimum interval. A plan is chosen to follow the corridor while limiting lateral and heading deviations:
+\begin{equation}
+ J(u)=\sum_{k=1}^{HK}\left(w_{\mathrm{lat}}e_{\mathrm{lat},k}^2+
+ w_\psi e_{\psi,k}^2\right),
+ \qquad u^\star=\arg\min_{u\,\mathrm{feasible}}J(u).
+\end{equation}
+
+The primary geometric safety test requires each predicted region to remain outside inflated obstacles and within corridor boundaries. For obstacle centre $o$ and inflated radius $r_{\mathrm{obs}}+r_{\mathrm{person}}+m$, this can be written as
+\begin{equation}
+ E_k\cap\mathcal D\!\left(o,r_{\mathrm{obs}}+r_{\mathrm{person}}+m\right)=\varnothing.
+\end{equation}
+
+When the full-window conformal coverage assumption applies and all regions satisfy the geometric test, collision along that predicted window is bounded by the corresponding miscoverage event:
+\begin{equation}
+ [\text{all predicted regions avoid obstacles and walls}]
+ \quad\Longrightarrow\quad
+ \Pr(\text{collision within the window})\le\bar\delta.
+\end{equation}
+In practice, some environments admit no fully feasible plan; the controller therefore also uses a softer risk estimate.
+
+The probability-based collision risk index (P-CRI) approximates collision likelihood by constructing a Gaussian surrogate whose confidence ellipse matches the conformal region:
+\begin{align}
+ S_k&=\frac{Q_k}{\chi_2^2(1-\bar\delta)},\\
+ P_{k,o}&=\Pr_{x\sim\mathcal N(\hat p_k,S_k)}
+ \!\left(\|x-o\|\le r_{\mathrm{obs}}+r_{\mathrm{person}}+m\right),\\
+ P_k&\le\min\left(1,\sum_oP_{k,o}+\sum_{\mathrm{wall}}P_{k,w}\right).
+\end{align}
+
+P-CRI is a model-based \emph{surrogate risk score}, not a separate distribution-free collision guarantee. When no candidate passes the geometric test, the controller can select a lower-risk compromise using
+\begin{equation}
+ J_{\mathrm{soft}}(u)=J(u)+\sum_k w_0e^{-s_k/d_0}P_k,
+ \qquad w_0=30.
+\end{equation}
+
+The weighting emphasizes risks near the person, since the plan will be reconsidered before the distant steps are executed. If the selected plan still presents substantial short-term risk, the system may issue STOP and determine a safer direction before continuing.
+
+\subsection{Online Adaptation: RLS and LQT}
+\label{sec:adapt}
+
+The model is initially trained on simulated responses, whereas an individual may move differently. Two complementary online updates address this difference. \textbf{RLS} corrects the LSTM's final output layer using observed prediction residuals, reducing systematic errors without retraining the full network. In schematic form, with feature vector $z$, output error $\hat o-o$, and RLS matrix $P$:
+\begin{align}
+ P&\leftarrow P-\frac{Pzz^\top P}{1+z^\top Pz},\\
+ W&\leftarrow W-\eta(\hat o-o)z^\top P.
+\end{align}
+
+\textbf{LQT} instead adapts the uncertainty scale. Each realised window has a normalised error $r_t=R_t/C$. A window is missed when $r_t>q_t$, so the update increases the scale following misses and gradually reduces it following coverage:
+\begin{align}
+ q_t&=\theta_t^\top z_t,\qquad
+ z_t=(1,r_{t-1},\ldots,r_{t-p}),\\
+ \theta_{t+1}&=\Pi\!\left[\theta_t+
+ \mathrm{lr}\left(\mathbf1\{r_t>q_t\}-\bar\delta\right)z_t\right].
+\end{align}
+
+The projection $\Pi$ constrains the region multiplier to the configured range ($0.05\le q\le10$). In both strategies, updates are performed \emph{prequentially}: the previously issued prediction is evaluated before its observations are used to modify the predictor. RLS aims to improve the predicted trajectory, while LQT aims to keep uncertainty regions appropriately scaled; the methods therefore address different aspects of individual variation.
+
+\subsection{Operating Sequence}
+\label{sec:workflow}
+
+Offline, the human-response simulator generates training, calibration, and test trajectories. The LSTM is trained on the first split, and conformal thresholds and covariance estimates are obtained from the second. During navigation, observed motion is processed every 0.1 seconds; MPC evaluates candidate plans every 0.5 seconds, sends an allowed vest instruction, and repeats the process. Completed prediction windows update the uncertainty scale and the final predictor layer. Both variants share this loop, but use different cue languages and different strategies for resuming movement after STOP.
+
+The implementation retains its original configuration and source-code names: \texttt{config\_mixed.yaml} and \texttt{config\_point\_mixed.yaml} specify the two variants; the source directories and image filenames are likewise unchanged to preserve compatibility with the existing project.
+
+% ----------------------------------------------------------
+\section{Hybrid Guidance}
+\label{sec:hybrid}
+
+\subsection{Vest Cues and Synthetic Human Responses}
+
+The Hybrid strategy communicates instructions using discrete haptic cues: L for a left turn, F for forward movement, and R for a right turn. STOP can interrupt walking when necessary. Following a STOP, the vest indicates a new heading, the person turns in place, and F resumes movement.
+
+\imagefigure{figs/h1_signals.png}{Hybrid cue language and the delayed heading response of a simulated person.}
+
+The simulator models human differences through reaction delay, turn size, turn rate, speed changes, and occasional missed or confused cues. The training population has typical lateral turn magnitudes near $35^\circ$, whereas the evaluation also considers an intentionally shifted person with different left and right responses. This mismatch is useful for assessing whether online adaptation can personalise guidance.
+
+We generated 8,000 simulated episodes of 120 seconds, divided into 3,600 training, 3,600 calibration, and 800 test episodes. Random cue sequences and STOP events produce diverse walking and turning behaviours.
+
+\imagefigure{figs/hd1_data.png}{Examples of Hybrid synthetic trajectories, cue-dependent heading changes, and the standing and walk-off phases after STOP.}
+
+\subsection{Prediction and Uncertainty Regions}
+
+For Hybrid, the LSTM receives a sequence of discrete cues and the time since the latest instruction. It learns the resulting trajectory rather than assuming that each instruction produces a fixed turn. Across the five training steps, errors increase with prediction horizon; the final-step validation error was approximately 3.00 m. For the shifted evaluation person, the first 3-second response is more difficult to predict, illustrating why adaptation and uncertainty modelling are needed.
+
+\imagefigure{figs/hl1_lstm.png}{Hybrid LSTM learning curves and predicted versus observed movement following vest cues.}
+
+Conformal calibration is organised by the active or planned cue sequence and response context. Across 110,108 test windows, the observed whole-window coverage was about 0.898 for 9-second plans, close to the nominal 0.90 level on the synthetic test population. Different plans have differently shaped regions, and uncertainty generally increases farther into the future.
+
+\imagefigure{figs/hc1_conformal.png}{Hybrid calibration scores, test-window coverage, and evolution of uncertainty-region dimensions.}
+\imagefigure{figs/h3_regions.png}{Predicted motion and conformal regions for alternative Hybrid first cues at the same planning instant.}
+\subsection{MPC Decisions and the STOP Procedure}
+
+The Hybrid MPC evaluates 27 three-step cue plans over a 9-second horizon. It prefers a plan that tracks the route while keeping its uncertainty regions clear of obstacles and walls. When none satisfies the geometric constraint, soft P-CRI penalisation balances progress and estimated risk. Because predicted regions often become large, this fallback is frequently used in Hybrid simulations.
+
+\imagefigure{figs/h2_tree.png}{Hybrid planning example: candidate cue sequences, selected trajectory and uncertainty regions, and associated tracking costs.}
+\imagefigure{figs/h4_pcri.png}{Risk assessment for a Hybrid decision near an obstacle, showing why the controller considers STOP.}
+
+A STOP is considered when first-step P-CRI exceeds 0.10. The controller also accounts for the motion that can occur during reaction and braking. Once the person is stationary, candidate headings around $360^\circ$ are evaluated in $10^\circ$ increments, after which the vest commands a turn in place and then a walk-off. This enables the controller to change direction without requiring continued movement near a nearby obstacle.
+
+\imagefigure{figs/h5_stop_scan.png}{Hybrid STOP recovery: candidate headings, chosen turn, and the sequence of braking, turning, and walking again.}
+
+\subsection{Online Adaptation and Simulation Findings}
+
+To study individual variation, we compared a fixed predictor, LQT alone, RLS alone, and their combination over 120 consecutive obstacle-free runs with the same shifted simulated person. With no adaptation, coverage was 0.59 across the runs. RLS reduced prediction error, whereas LQT enlarged regions when they were too small. Their combination improved coverage, although the final 20-run coverage of 0.84 remained below the nominal 0.90 target.
+
+\imagefigure{figs/long_hybrid.png}{Hybrid long-run adaptation: empirical coverage, LQT region scale, and RLS prediction error over repeated runs.}
+
+In the obstacle scenarios, we compared 21 runs with adaptation disabled and 21 with RLS and LQT enabled. Both settings reached the destination in 19 of 21 runs. Adaptation raised coverage of realised windows from 0.56 to 0.68, but it did not eliminate failures: two adapted runs included obstacle contact, while one non-adapted run included wall contact. These cases illustrate the limits of soft risk constraints and imperfect human-response models.
+
+\imagefigure{figs/h6_closed_loop.png}{Hybrid closed-loop examples showing the walked path, issued cues, selected plans, and uncertainty regions at 3, 6, and 9 seconds.}
+
+% ----------------------------------------------------------
+\section{\NSA\ guidance}
+\label{sec:nsa}
+
+\subsection{Continuous Vest Guidance and Simulated Responses}
+
+Unlike Hybrid, \NSA\ communicates a continuously updated direction toward a selected target location. The person keeps walking and adjusts heading until the target direction is aligned with the current heading. The target may be maintained or replaced by the controller. For person position $p=(p_x,p_y)$, heading $\psi$, and target $g=(g_x,g_y)$, the guidance angle is
+\begin{equation}
+ \theta_g=\operatorname{atan2}(g_y-p_y,g_x-p_x),
+ \qquad \beta(t)=\operatorname{wrap}(\theta_g(t)-\psi(t)).
+\end{equation}
+
+\imagefigure{figs/s1_signal.png}{\NSA\ vest direction and its evolution as the simulated person approaches an indicated target.}
+
+The simulated response follows a steering model inspired by Fajen and Warren. It captures perception delay, a dead band for small directional errors, individual steering strength, damping, walking speed, and motion noise:
+\begin{align}
+ \ddot\psi&=-b\dot\psi+k\,\mathrm{db}\bigl(\beta(t-\tau)\bigr)
+   +\nu_{\mathrm{veer}}+\eta_\psi(t),\\
+ \dot p&=v(\cos\psi,\sin\psi),\\
+ \dot v&=-\frac{v-v_{\mathrm{des}}}{T_v}+\eta_v(t).
+\end{align}
+
+Synthetic trajectories were generated using the same general episode and data-split structure as Hybrid. Target directions and distances were sampled to cover straight movement, moderate adjustments, stronger turning, and STOP-and-resume cases.
+
+\imagefigure{figs/p1_data.png}{\NSA\ synthetic walking data and variation across simulated individuals.}
+\imagefigure{figs/p2_response.png}{A simulated \NSA\ response showing steering delay, dead-band behaviour, and gradual heading correction.}
+
+\subsection{Motion Prediction and Calibration}
+
+For \NSA, each planning step specifies whether the current target is maintained or a new direction is selected. The LSTM therefore predicts the response to a sequence of directional references. On the reported synthetic test windows, mean prediction error was about 0.19 m in the first 3 seconds and 0.59 m in the 6--9-second interval.
+
+\imagefigure{figs/p3_lstm.png}{\NSA\ LSTM predictions compared with realised trajectories, prediction error across the horizon, and training behaviour.}
+
+Conformal regions depend on the recent response context and planned reference sequence. Symmetry between left and right steering responses is used to share calibration information. The stored calibration achieved 0.887 overall coverage for 9-second test windows against the 0.90 nominal target; walking windows reached 0.896. Coverage was lower for some standing contexts, and the original experiment notes that the stored calibration preceded the current predictor checkpoint. Recalibration against the final checkpoint is therefore necessary before interpreting the nominal level as achieved for all contexts.
+
+\imagefigure{figs/c3_regions.png}{\NSA\ conformal ellipses along an example prediction and their growth with the planning horizon.}
+\imagefigure{figs/p4_conformal.png}{\NSA\ calibration distributions, coverage across contexts, example regions, and fallback groups.}
+
+\subsection{MPC, Risk Assessment, and STOP}
+
+MPC selects among target directions and distances surrounding the person. During ordinary walking, the first step uses a polar candidate grid over the forward $\pm90^\circ$ sector with distances of 2, 4, and 6 m, and later steps consider a smaller selection. Invalid targets are removed before trajectory prediction. The same geometric constraint and P-CRI-based soft fallback used in Hybrid are then applied to the predicted trajectories.
+
+\imagefigure{figs/s2_mpc.png}{\NSA\ candidate target grid, predicted alternatives, selected trajectory, and its uncertainty regions.}
+\imagefigure{figs/s3_constraint.png}{\NSA\ safety constraint: a candidate whose uncertainty region overlaps an inflated obstacle is rejected, while a clear alternative is accepted.}
+\imagefigure{figs/s4_pcri.png}{\NSA\ P-CRI example: predicted movement, Gaussian surrogate used for risk estimation, and risk along the planning horizon.}
+
+The \NSA\ STOP trigger is 0.20 for first-step P-CRI. A braking look-ahead determines whether stopping is immediately necessary. After a STOP, the controller considers directions over a full $360^\circ$ grid in $15^\circ$ increments so that the person can resume in a safer direction. Unlike Hybrid, this method does not require a separate turn-in-place instruction.
+
+\imagefigure{figs/s5_stop.png}{\NSA\ STOP example: a postponed stop, the eventual stop decision, and direction selection after standing.}
+
+\subsection{Online Adaptation and Simulation Findings}
+
+The 120-run experiment again uses a shifted simulated person, in this case with reduced steering gain and increased perception delay. The frozen predictor covered 0.60 of realised windows. RLS reduced prediction error from about 0.70 m to 0.48 m and increased coverage to approximately 0.91; the combination of RLS and LQT ended near the 0.90 target. In this experiment RLS contributed the larger improvement, while LQT stayed near its original region scale.
+
+\imagefigure{figs/long_point.png}{\NSA\ adaptation across repeated runs: empirical coverage, region-scale updates, and predictor error.}
+
+In the obstacle scenarios, both the non-adaptive and adaptive settings reached the destination in 19 of 21 runs. No reported run touched an obstacle or wall. Coverage of realised windows increased from 0.84 without adaptation to 0.88 with both online methods, and the controller generally required fewer STOP events than Hybrid. The remaining failures were timeouts rather than reported collisions.
+
+\imagefigure{figs/s6a_closed_loop.png}{\NSA\ closed-loop trajectories in slalom and zigzag scenarios, with selected targets and predicted conformal regions.}
+\imagefigure{figs/s6b_closed_loop.png}{\NSA\ closed-loop trajectories in corner and bend scenarios, displayed with the same prediction and uncertainty information.}
+
+
+
+\section{Conclusion}
+
+This study presents a common pipeline for haptic human guidance that joins cue-conditioned motion prediction, conformal uncertainty regions, risk-aware MPC, and online personalisation. Hybrid and \NSA\ demonstrate how the same controller can support either discrete or continuous vest instructions. Simulation results show the potential of individual adaptation, while also highlighting calibration mismatch, conservative long-horizon uncertainty, and the limits of soft safety constraints. The next step is to validate response models, user comfort, and actual navigation safety in experiments with human participants.
+
+% ----------------------------------------------------------
+\section{References}
+\begin{enumerate}
+\item L. Lindemann, M. Cleaveland, G. Shim, and G. J. Pappas, ``Safe Planning in Dynamic Environments using Conformal Prediction,'' \emph{IEEE Robotics and Automation Letters}, 2023. \href{https://arxiv.org/abs/2210.10254}{arXiv:2210.10254}.
+\item F. Areces, C. Mohri, T. Hashimoto, and J. Duchi, ``Online Conformal Prediction via Online Optimization,'' \emph{ICML}, PMLR 267, pp. 1604--1649, 2025. \href{https://proceedings.mlr.press/v267/areces25a.html}{PMLR article}.
+\item J. Gao, Y. Lu, X. Qi, Y. Kou, B. Li, L. Li, S. Yu, and W. Hu, ``Recursive Least-Squares Estimator-Aided Online Learning for Visual Tracking,'' \emph{IEEE Transactions on Pattern Analysis and Machine Intelligence}, doi:10.1109/TPAMI.2022.3156977. \href{https://arxiv.org/abs/2112.14016}{arXiv:2112.14016}.
+\item J. Yang, K. Lee, and S. Han, ``Heterogeneous Predictor-based Risk-Aware Planning with Conformal Prediction in Dense, Uncertain Environments,'' arXiv:2507.11920, 2025. \href{https://arxiv.org/abs/2507.11920}{arXiv:2507.11920}.
+\item B. R. Fajen and W. H. Warren, ``Behavioral Dynamics of Steering, Obstacle Avoidance, and Route Selection,'' \emph{Journal of Experimental Psychology: Human Perception and Performance}, vol. 29, no. 2, 2003.
+\item V. Vovk, A. Gammerman, and G. Shafer, \emph{Algorithmic Learning in a Random World}. Springer, 2005.
+\end{enumerate}
+\end{document}

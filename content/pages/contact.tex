@@ -1,0 +1,31 @@
+% =====================================================================
+%  contact.tex — the Contact page
+%  (the links on the left come from the \Social lines in site.tex)
+% =====================================================================
+
+\PageTitle[yellow]{Contact}
+
+\begin{Intro}
+Feel free to say hi. I usually reply within a few days. \texttt{:) }
+\end{Intro}
+
+\FormTitle{Contact Me}
+
+% \FormField[type]{name}{Label}{Placeholder}     type: email, text, textarea
+\FormField[email]{email}{Your mail:}{example@email.com}
+\FormField[text]{subject}{Subject:}{About...}
+\FormField[textarea]{message}{Content:}{Type here...}
+
+\FormButton{Send}
+
+% Without \FormEndpoint the Send button opens the visitor's mail app with the message filled in
+% (to the mail address in site.tex); \FormNote is shown next to the button after that.
+\FormNote{Your mail app should open with the message ready to send. If nothing happens, please write to the e-mail address on the left.}
+
+% The message is sent straight from the page through Web3Forms (access key from web3forms.com;
+% it is meant to be public and only allows sending mail to your own address).
+% To go back to the "open the mail app" behaviour, put a % in front of the next two lines.
+\FormEndpoint{https://api.web3forms.com/submit}
+\FormAccessKey{cfbf2d1b-9443-4a54-b9cb-e968f21aa858}
+\FormSent{Thank you, your message has been sent.}
+\FormError{Sorry, the message could not be sent. Please write to the e-mail address on the left.}

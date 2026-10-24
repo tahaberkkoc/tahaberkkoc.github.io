@@ -1,0 +1,19 @@
+{
+  "name": "taha-berk-koc-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal portfolio website. All texts come from LaTeX files in content/.",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "node scripts/build.js",
+    "preview": "node scripts/preview.js",
+    "pdf": "cd content && latexmk -pdf -interaction=nonstopmode main.tex"
+  },
+  "engines": {
+    "node": ">=18.11"
+  },
+  "dependencies": {
+    "katex": "^0.16.11"
+  }
+}

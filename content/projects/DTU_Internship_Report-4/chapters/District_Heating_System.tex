@@ -1,0 +1,1149 @@
+%!TEX root = ../Thesis.tex
+\chapter{District Heating System}
+
+\section{Derivation of $\dot{T}_i$ Equation}
+\label{sec:district_heating_temperature_derivation}
+
+The district heating pipes are assumed to transport incompressible water with
+constant specific heat capacity. The flow velocity is assumed to be constant
+throughout each pipe, and only temperature variations in the axial direction
+are considered.
+
+For a pipe with axial coordinate \(z\), the energy balance is written as
+
+\begin{equation}
+    \partial_t u(t,z)
+    =
+    -
+    \partial_z \mathcal{N}_h(t,z)
+    +
+    q(t,z),
+    \qquad
+    z \in [z_0,z_f]
+\end{equation}
+
+where \(u(t,z)\) denotes the internal energy per unit volume,
+\(\mathcal{N}_h(t,z)\) denotes the enthalpy flux, and \(q(t,z)\) represents
+the heat loss per unit volume.
+
+The enthalpy flux is expressed as
+
+\begin{equation}
+    \mathcal{N}_h(t,z)
+    =
+    H
+    \left(
+        T(t,z),p,\mathcal{N}(t)
+    \right)
+\end{equation}
+
+where \(T(t,z)\) is the water temperature, \(p\) is the pressure, and
+\(\mathcal{N}(t)\) is the molar flux. The molar flux is given by
+
+\begin{equation}
+    \mathcal{N}(t)
+    =
+    \rho v(t)
+\end{equation}
+
+where \(\rho\) denotes the constant density and \(v(t)\) denotes the flow
+velocity.
+
+The heat loss to the surroundings is modeled as
+
+\begin{equation}
+    q(t,z)
+    =
+    -
+    k
+    \left(
+        T(t,z)-T_a(t)
+    \right)
+\end{equation}
+
+where \(k\) is the conductance and \(T_a(t)\) is the ambient temperature.
+
+Applying the chain rule to the enthalpy flux gives
+
+\begin{equation}
+    \partial_T
+    H
+    \left(
+        T(t,z),p,\mathcal{N}(t)
+    \right)
+    \partial_z T(t,z)
+    =
+    \partial_z \mathcal{N}_h(t,z)
+\end{equation}
+
+Using the specific heat capacity \(c_p\), this becomes
+
+\begin{equation}
+    \mathcal{N}(t)c_p
+    \partial_z T(t,z)
+    =
+    \partial_z \mathcal{N}_h(t,z)
+\end{equation}
+
+The pipe is then segmented into \(M\) finite volumes. For the \(i\)-th
+segment,
+
+\begin{equation}
+    \Omega_i
+    =
+    [z_i,z_{i+1}]
+\end{equation}
+
+and the energy balance is integrated over the segment:
+
+\begin{equation}
+    \partial_t
+    \int_{\Omega_i}
+    u(t,z)\,dz
+    =
+    -
+    \int_{\Omega_i}
+    \partial_z \mathcal{N}_h(t,z)\,dz
+    +
+    \int_{\Omega_i}
+    q(t,z)\,dz
+\end{equation}
+
+Multiplying by the cross-sectional area \(A\), the energy balance of the
+segment can be written as
+
+\begin{equation}
+    \dot{U}_i(t)
+    =
+    -
+    A\mathcal{N}(t)c_p
+    \int_{z_i}^{z_{i+1}}
+    \partial_z T(t,z)\,dz
+    +
+    Q_i(t)
+\end{equation}
+
+where \(U_i(t)\) denotes the internal energy of the segment and \(Q_i(t)\)
+denotes the corresponding heat loss.
+
+Evaluating the integral gives
+
+\begin{equation}
+    \dot{U}_i(t)
+    =
+    -
+    A\mathcal{N}(t)c_p
+    \left(
+        T(t,z_{i+1})
+        -
+        T(t,z_i)
+    \right)
+    +
+    Q_i(t)
+\end{equation}
+
+Using the average temperature of each finite volume, this is approximated as
+
+\begin{equation}
+    \dot{U}_i(t)
+    =
+    -
+    A\mathcal{N}(t)c_p
+    \left(
+        \bar{T}_{i+1}(t)
+        -
+        \bar{T}_i(t)
+    \right)
+    +
+    Q_i(t)
+\end{equation}
+
+The internal energy of the \(i\)-th segment is written as
+
+\begin{equation}
+    U_i(t)
+    =
+    n c_p \bar{T}_i(t)
+\end{equation}
+
+where
+
+\begin{equation}
+    n
+    =
+    A\Delta z \rho,
+    \qquad
+    \Delta z
+    =
+    z_{i+1}-z_i
+\end{equation}
+
+The heat loss of the segment is approximated by
+
+\begin{equation}
+    Q_i(t)
+    \approx
+    -
+    A\Delta z k
+    \left(
+        \bar{T}_i(t)-T_a(t)
+    \right)
+\end{equation}
+
+Substituting the internal-energy and heat-loss expressions into the energy
+balance gives
+
+\begin{align}
+    c_p A\Delta z \rho \,
+    \dot{\bar{T}}_i(t)
+    &=
+    -
+    A\mathcal{N}(t)c_p
+    \left(
+        \bar{T}_{i+1}(t)
+        -
+        \bar{T}_i(t)
+    \right)
+    \nonumber\\
+    &\quad
+    -
+    A\Delta z k
+    \left(
+        \bar{T}_i(t)-T_a(t)
+    \right)
+\end{align}
+
+Since
+
+\begin{equation}
+    \mathcal{N}(t)
+    =
+    \rho v(t)
+\end{equation}
+
+the equation can be divided by \(A\Delta z\rho c_p\), resulting in
+
+\begin{equation}
+    \boxed{
+    \dot{\bar{T}}_i(t)
+    =
+    -
+    \frac{v(t)}{\Delta z}
+    \left(
+        \bar{T}_{i+1}(t)
+        -
+        \bar{T}_i(t)
+    \right)
+    -
+    \frac{k}{\rho c_p}
+    \left(
+        \bar{T}_i(t)
+        -
+        T_a(t)
+    \right)
+    }
+    \label{eq:district_heating_temperature}
+\end{equation}
+
+The resulting pipe model can subsequently be expressed in continuous
+state-space form as
+
+\begin{align}
+    \dot{x}(t)
+    &=
+    A_c x(t)
+    +
+    B_c u(t)
+    +
+    E_c d(t)\\
+    y(t)
+    &=
+    C_c x(t)
+    +
+    e(t_k)
+\end{align}
+
+where the states \(x(t)\) correspond to the average temperatures
+\(\bar{T}_i(t)\), \(u(t)\) represents the supply temperature \(T_s\),
+\(d(t)\) represents the ambient temperature \(T_a\), and \(y(t)\) contains
+the temperatures measured at the selected pipe nodes.
+
+
+\section{Change of Variable}
+\label{sec:district_heating_change_variable}
+
+From the temperature equation derived in the previous section,
+
+\begin{equation}
+    \dot{T}_i
+    =
+    -
+    \frac{v}{\Delta z}
+    \left(
+        T_i-T_{i-1}
+    \right)
+    -
+    \frac{k}{\rho c_p}
+    \left(
+        T_i-T_a
+    \right)
+\end{equation}
+
+To simplify the notation, define
+
+\begin{equation}
+    \alpha(v)
+    =
+    \frac{v}{\Delta z}
+\end{equation}
+
+and
+
+\begin{equation}
+    \beta
+    =
+    \frac{k}{\rho c_p}
+\end{equation}
+
+The temperature dynamics can then be written as
+
+\begin{equation}
+    \dot{T}_i
+    =
+    -
+    \alpha(v)
+    \left(
+        T_i-T_{i-1}
+    \right)
+    -
+    \beta
+    \left(
+        T_i-T_a
+    \right)
+    \label{eq:temperature_alpha_beta}
+\end{equation}
+
+A change of variables is introduced by defining the state relative to the
+ambient temperature as
+
+\begin{equation}
+    x_i
+    =
+    T_i-T_a
+    \label{eq:change_state}
+\end{equation}
+
+Similarly, the input is defined as the supply temperature relative to the
+ambient temperature,
+
+\begin{equation}
+    u
+    =
+    T_s-T_a
+    \label{eq:change_input}
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+    T_i
+    =
+    x_i+T_a
+\end{equation}
+
+and
+
+\begin{equation}
+    T_s
+    =
+    u+T_a
+\end{equation}
+
+Differentiating \cref{eq:change_state} gives
+
+\begin{equation}
+    \dot{x}_i
+    =
+    \dot{T}_i-\dot{T}_a
+\end{equation}
+
+Substituting
+
+\begin{equation}
+    T_i=x_i+T_a,
+    \qquad
+    T_{i-1}=x_{i-1}+T_a
+\end{equation}
+
+into \cref{eq:temperature_alpha_beta} gives
+
+\begin{equation}
+    \dot{x}_i+\dot{T}_a
+    =
+    -
+    \alpha
+    \left[
+        (x_i+T_a)
+        -
+        (x_{i-1}+T_a)
+    \right]
+    -
+    \beta x_i
+\end{equation}
+
+After simplifying,
+
+\begin{equation}
+    \boxed{
+    \dot{x}_i
+    =
+    -
+    (\alpha+\beta)x_i
+    +
+    \alpha x_{i-1}
+    -
+    \dot{T}_a
+    }
+    \label{eq:district_heating_xi}
+\end{equation}
+
+For the first pipe segment, the upstream temperature is the supply
+temperature \(T_s\). Since
+
+\begin{equation}
+    u=T_s-T_a
+\end{equation}
+
+the first state equation becomes
+
+\begin{equation}
+    \boxed{
+    \dot{x}_0
+    =
+    -
+    (\alpha+\beta)x_0
+    +
+    \alpha u
+    -
+    \dot{T}_a
+    }
+    \label{eq:district_heating_x0}
+\end{equation}
+
+Collecting all pipe-segment temperatures into the state vector gives the
+continuous-time system
+
+\begin{equation}
+    \boxed{
+    \dot{x}
+    =
+    A_c(v)x
+    +
+    B_c(v)u
+    +
+    E_c\dot{T}_a
+    }
+    \label{eq:district_heating_continuous}
+\end{equation}
+
+The system matrix is
+
+\begin{equation}
+A_c(v)
+=
+\begin{bmatrix}
+-(\alpha+\beta) & 0 & 0 & \cdots & 0 \\
+\alpha & -(\alpha+\beta) & 0 & \cdots & 0 \\
+0 & \alpha & -(\alpha+\beta) & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & 0 \\
+0 & \cdots & 0 & \alpha & -(\alpha+\beta)
+\end{bmatrix}
+\end{equation}
+
+where
+
+\begin{equation}
+    \alpha=\alpha(v)=\frac{v}{\Delta z}
+\end{equation}
+
+The input matrix is
+
+\begin{equation}
+B_c(v)
+=
+\begin{bmatrix}
+\alpha \\
+0 \\
+\vdots \\
+0
+\end{bmatrix}
+\end{equation}
+
+and the disturbance matrix associated with the change in ambient temperature
+is
+
+\begin{equation}
+E_c
+=
+\begin{bmatrix}
+-1 \\
+-1 \\
+\vdots \\
+-1
+\end{bmatrix}
+\end{equation}
+
+\section{Controller and Hidden Plant Approach}
+\label{sec:controller_hidden_plant}
+
+After introducing the change of variable
+
+\begin{equation}
+    x_i = T_i-T_a
+\end{equation}
+
+the continuous-time district heating model was obtained as
+
+\begin{equation}
+    \dot{x}
+    =
+    A_c(v)x
+    +
+    B_c(v)u
+    +
+    E_c\dot{T}_a
+    \label{eq:district_full_continuous}
+\end{equation}
+
+The change of variable therefore introduces the derivative of the ambient
+temperature into the state dynamics. In the implementation, the model used
+by the controller and the model used to simulate the physical plant are
+treated separately.
+
+
+\subsection{Controller Approach}
+\label{subsec:district_controller}
+
+On the controller side, the ambient temperature is assumed to remain constant
+within each sampling interval. Thus,
+
+\begin{equation}
+    T_a(t)
+    =
+    T_{a,k},
+    \qquad
+    t\in[t_k,t_{k+1})
+\end{equation}
+
+and consequently
+
+\begin{equation}
+    \dot{T}_a(t)
+    =
+    0,
+    \qquad
+    t\in(t_k,t_{k+1})
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+    E_c\dot{T}_a=0
+\end{equation}
+
+and the continuous-time model used by the controller reduces to
+
+\begin{equation}
+    \boxed{
+    \dot{x}
+    =
+    A_c(v)x
+    +
+    B_c(v)u
+    }
+    \label{eq:district_controller_continuous}
+\end{equation}
+
+This model is discretized using a Zero-Order Hold assumption. During each
+sampling interval, the matrices and the input are kept constant. The
+resulting state at the end of the sampling interval is
+
+\begin{equation}
+    x(t_{k+1}^{-})
+    =
+    e^{A_{c,k}\Delta t}x_k
+    +
+    \int_{0}^{\Delta t}
+    e^{A_{c,k}(\Delta t-\tau)}
+    B_{c,k}u_k
+    \,d\tau
+    \label{eq:district_zoh}
+\end{equation}
+
+The discrete-time matrices are obtained from
+
+\begin{equation}
+    \exp
+    \left(
+    \begin{bmatrix}
+        A_c & B_c \\
+        0 & 0
+    \end{bmatrix}
+    \Delta t
+    \right)
+    =
+    \begin{bmatrix}
+        A_k & B_k \\
+        0 & I
+    \end{bmatrix}
+    \label{eq:district_zoh_matrix}
+\end{equation}
+
+Thus, the controller uses the discrete-time model generated from the
+continuous dynamics under the assumption that the ambient temperature does
+not change inside the sampling interval.
+
+
+\subsection{Hidden Plant Approach}
+\label{subsec:district_hidden_plant}
+
+The hidden plant represents the system used to generate the simulated
+measurements. In contrast to the controller model, the hidden plant is
+affected by the actual ambient-temperature values.
+
+Because the transformed state is defined relative to the ambient temperature,
+a change in \(T_a\) between two sampling instants changes the state
+coordinates. After the continuous evolution over one sampling interval,
+
+\begin{equation}
+    x_{k+1}
+    =
+    x_{k+1}^{-}
+    +
+    \left(
+        T_{a,k}-T_{a,k+1}
+    \right)\mathbf{1}
+    \label{eq:district_ambient_shift}
+\end{equation}
+
+The ambient-temperature contribution is therefore defined as
+
+\begin{equation}
+    d_k
+    =
+    \left(
+        T_{a,k}-T_{a,k+1}
+    \right)\mathbf{1}
+    \label{eq:district_dk}
+\end{equation}
+
+The hidden plant simulation consequently uses
+
+\begin{equation}
+    \boxed{
+    x_{k+1}
+    =
+    A_kx_k
+    +
+    B_ku_k
+    +
+    d_k
+    +
+    w_k
+    }
+    \label{eq:district_hidden_state}
+\end{equation}
+
+where
+
+\begin{equation}
+    w_k
+    \sim
+    \mathcal{N}(0,R_w)
+\end{equation}
+
+The output represents the outlet temperature relative to the current ambient
+temperature,
+
+\begin{equation}
+    y_k
+    =
+    T_{\mathrm{out},k}
+    -
+    T_{a,k}
+\end{equation}
+
+The measured output is modeled as
+
+\begin{equation}
+    \boxed{
+    y_k
+    =
+    Cx_k+\nu_k
+    }
+    \label{eq:district_hidden_output}
+\end{equation}
+
+with
+
+\begin{equation}
+    \nu_k
+    \sim
+    \mathcal{N}(0,R_v)
+\end{equation}
+
+The hidden plant is used only to simulate the underlying system behavior.
+Its internal state is not assumed to be directly available to the
+controller. Instead, the controller receives the noisy output measurements,
+and the Kalman filter is applied to these measurements in order to estimate
+the internal state.
+
+Therefore, the controller performs its prediction using the model in which
+the ambient temperature is assumed constant over each sampling interval,
+whereas the hidden plant evolves according to the actual ambient-temperature
+sequence through the additional term \(d_k\). This separation allows the
+effect of changing ambient conditions to be included in the simulation while
+maintaining the controller formulation based on the ZOH-discretized model.
+
+\subsection{Change on Kalman Filter}
+\label{subsec:district_kalman_change}
+
+The change of variable
+
+\begin{equation}
+    x_i=T_i-T_a
+\end{equation}
+
+also introduces a modification to the Kalman-filter procedure. Since the
+state is defined relative to the ambient temperature, a change in the ambient
+temperature between two consecutive sampling instants changes the state
+coordinates.
+
+As derived previously,
+
+\begin{equation}
+    x_{k+1}
+    =
+    x_{k+1}^{-}
+    +
+    \left(
+        T_{a,k}-T_{a,k+1}
+    \right)\mathbf{1}
+\end{equation}
+
+Defining
+
+\begin{equation}
+    d_k
+    =
+    \left(
+        T_{a,k}-T_{a,k+1}
+    \right)\mathbf{1}
+\end{equation}
+
+the same correction must also be applied to the predicted state estimate of
+the Kalman filter.
+
+The measurement-update equations remain unchanged. Starting from the prior
+estimate \(\hat{x}_{k|k-1}\), the measurement \(y_k\) is used to obtain
+
+\begin{equation}
+    \hat{x}_{k|k}
+    =
+    \hat{x}_{k|k-1}
+    +
+    P_{k|k-1}C^T
+    \left(
+        CP_{k|k-1}C^T+R_v
+    \right)^{-1}
+    \left(
+        y_k-C\hat{x}_{k|k-1}
+    \right)
+\end{equation}
+
+and
+
+\begin{equation}
+    P_{k|k}
+    =
+    P_{k|k-1}
+    -
+    P_{k|k-1}C^T
+    \left(
+        CP_{k|k-1}C^T+R_v
+    \right)^{-1}
+    CP_{k|k-1}
+\end{equation}
+
+The time update is then first performed using the controller model,
+
+\begin{equation}
+    \hat{x}_{k+1|k}^{-}
+    =
+    A_k\hat{x}_{k|k}
+    +
+    B_ku_k
+\end{equation}
+
+At this stage, the predicted state is based on the assumption used by the
+controller that the ambient temperature remains constant over the sampling
+interval.
+
+When the next ambient-temperature value \(T_{a,k+1}\) becomes available, the
+change in ambient temperature is calculated through
+
+\begin{equation}
+    d_k
+    =
+    \left(
+        T_{a,k}-T_{a,k+1}
+    \right)\mathbf{1}
+\end{equation}
+
+The predicted state estimate is then corrected as
+
+\begin{equation}
+    \boxed{
+    \hat{x}_{k+1|k}
+    =
+    \hat{x}_{k+1|k}^{-}
+    +
+    d_k
+    }
+\end{equation}
+
+Therefore, the complete prediction step can be written as
+
+\begin{equation}
+    \boxed{
+    \hat{x}_{k+1|k}
+    =
+    A_k\hat{x}_{k|k}
+    +
+    B_ku_k
+    +
+    d_k
+    }
+\end{equation}
+
+After this correction, the time index is advanced,
+
+\begin{equation}
+    k \leftarrow k+1
+\end{equation}
+
+and the corrected prediction becomes the prior estimate used in the next
+measurement update.
+
+Thus, the main modification to the Kalman-filter structure is the additional
+state correction introduced when the new ambient-temperature value becomes
+available. This allows the state estimate to remain consistent with the
+definition \(x_i=T_i-T_a\) while the actual ambient temperature changes over
+time.
+
+\section{Updates on Implementation}
+\label{sec:district_heating_implementation_updates}
+
+Two modifications were introduced in the implementation of the optimization
+problem. First, the changes in the control input \(U\) and flow velocity
+\(V\) were included in the cost function. Second, the numerical optimization
+method was changed from SLSQP to IPOPT due to the increase in computational
+time.
+
+\subsection{Penalizing Changes in \(U\) and \(V\)}
+
+Previously, the objective function penalized the tracking error together with
+the magnitudes of the control input \(U\) and the flow velocity \(V\).
+However, minimizing only these quantities does not explicitly discourage
+large changes between consecutive control actions.
+
+Therefore, additional terms were introduced to penalize the changes in
+\(U\) and \(V\). For consecutive prediction steps, these changes are defined
+as
+
+\begin{equation}
+    \Delta u_k
+    =
+    u_k-u_{k-1}
+\end{equation}
+
+and
+
+\begin{equation}
+    \Delta v_k
+    =
+    v_k-v_{k-1}
+\end{equation}
+
+The corresponding penalties are
+
+\begin{equation}
+    \Delta u_k^T R_{\Delta U}\Delta u_k
+\end{equation}
+
+and
+
+\begin{equation}
+    \Delta v_k^T R_{\Delta V}\Delta v_k
+\end{equation}
+
+The updated objective function therefore becomes
+
+\begin{align}
+    \phi(U,V)
+    =
+    \frac{1}{2}
+    \sum_{k=0}^{N-1}
+    \Big[
+    &
+    (\mu_{y,k}-\bar{y}_k)^T
+    Q
+    (\mu_{y,k}-\bar{y}_k)
+    +
+    u_k^T R_U u_k
+    +
+    v_k^T R_V v_k
+    \nonumber\\
+    &
+    +
+    \operatorname{tr}(Q P_{y,k})
+    +
+    \Delta u_k^T
+    R_{\Delta U}
+    \Delta u_k
+    +
+    \Delta v_k^T
+    R_{\Delta V}
+    \Delta v_k
+    \Big]
+    \label{eq:district_updated_cost}
+\end{align}
+
+Thus, \(R\) and \(S\) penalize the magnitude of the control variables,
+whereas \(Q_{\mathrm{change}}\) and \(S_{\mathrm{change}}\) penalize how
+rapidly these variables change from one time step to the next.
+
+For \(k>0\),
+
+\begin{align}
+    \Delta u_k &= u_k-u_{k-1},\\
+    \Delta v_k &= v_k-v_{k-1}
+\end{align}
+
+In the receding-horizon implementation, the first elements of the newly
+optimized sequences are compared with the values that were actually applied
+at the previous sampling instant. Therefore,
+
+\begin{align}
+    \Delta u_0
+    &=
+    u_0-u_{\mathrm{prev}},\\
+    \Delta v_0
+    &=
+    v_0-v_{\mathrm{prev}}
+\end{align}
+
+When no previous control value exists, such as at the beginning of the
+simulation, this first change term is not penalized.
+
+Including these additional terms encourages smoother control-input and
+flow-velocity sequences and avoids unnecessarily large changes between
+consecutive optimization steps.
+
+
+\subsection{Numerical Solver Change}
+
+The numerical solver used for the nonlinear optimization problem was also
+changed during the implementation.
+
+The earlier stochastic bilinear models were solved using Sequential Least
+Squares Programming (SLSQP). As the district heating model was extended,
+the optimization problem became more computationally demanding. In
+particular, the larger state dimension, propagation of the stochastic
+covariance, chance constraints, bilinear dependence on \(V\), and the
+additional penalties on the changes in \(U\) and \(V\) increased the
+computation time.
+
+For this reason, the implementation was changed from SLSQP to IPOPT. The
+optimization problem is constructed using CasADi.
+
+\section{Results}
+\label{sec:district_heating_results}
+
+The developed controller was evaluated on the single-pipe district heating
+example. The pipe was divided into \(M=6\) finite volumes over a total length
+of \(6\,\mathrm{km}\), and the sampling time was selected as
+\(\Delta t=0.5\,\mathrm{h}\). The heat-loss coefficient was
+
+\begin{equation}
+    \beta = 7.66\times10^{-3}\,\mathrm{h}^{-1}
+\end{equation}
+
+Two temperatures were considered as measured outputs: the temperature at the
+pipe outlet and the temperature at the third finite volume. The initial
+temperature of the pipe was \(65^\circ\mathrm{C}\), while the initial ambient
+temperature was \(0^\circ\mathrm{C}\).
+
+The physical output constraints were selected as
+
+\begin{equation}
+    65^\circ\mathrm{C}
+    \leq
+    T_{\mathrm{out}}
+    \leq
+    90^\circ\mathrm{C}
+\end{equation}
+
+for both measured locations. The supply-temperature and flow-velocity bounds
+were
+
+\begin{equation}
+    50^\circ\mathrm{C}
+    \leq
+    T_s
+    \leq
+    110^\circ\mathrm{C}
+\end{equation}
+
+and
+
+\begin{equation}
+    0.05
+    \leq
+    v
+    \leq
+    7.0
+    \quad \mathrm{km/h}
+\end{equation}
+
+The reference temperatures were changed during the simulation according to
+
+\begin{equation}
+    \bar{T}_1
+    =
+    \begin{bmatrix}
+        70 & 70
+    \end{bmatrix}^{T},
+    \qquad
+    \bar{T}_2
+    =
+    \begin{bmatrix}
+        70 & 87
+    \end{bmatrix}^{T},
+    \qquad
+    \bar{T}_3
+    =
+    \begin{bmatrix}
+        87 & 70
+    \end{bmatrix}^{T}
+\end{equation}
+
+Each reference level was held for \(48\) sampling instants, corresponding to
+\(24\,\mathrm{h}\). The ambient temperature was initially
+\(0^\circ\mathrm{C}\) and was changed to \(10^\circ\mathrm{C}\) at
+\(t=36\,\mathrm{h}\).
+
+The weighting matrices used in the optimization were
+
+\begin{equation}
+    Q=10^{11}I,
+    \qquad
+    R_U=0,
+    \qquad
+    R_V=0
+\end{equation}
+
+together with the move-suppression weights
+
+\begin{equation}
+    R_{\Delta U}=10,
+    \qquad
+    R_{\Delta V}=20
+\end{equation}
+
+The stochastic behavior was evaluated using \(200\) Monte Carlo
+realizations.
+
+
+\subsection{Open-Loop}
+\label{subsec:district_open_loop_results}
+
+In the open-loop simulation, the optimization problem was solved once over
+the complete simulation horizon. The complete future ambient-temperature
+profile was provided to the controller before the optimization. Therefore,
+the calculated sequences \(U^\ast\) and \(V^\ast\) already account for the
+scheduled change in ambient temperature.
+
+The same optimized input and velocity sequences were subsequently applied to
+all Monte Carlo realizations. 
+
+
+
+
+% Example figure:
+%
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]
+%     {open_loop_physical_summary.png}
+%     \caption{Open-loop Monte Carlo results for the single-pipe district
+%     heating system.}
+%     \label{fig:district_open_loop}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]
+%     {open_loop_z_profile.png}
+%     \caption{Open-loop temperature propagation along the pipe.}
+%     \label{fig:district_open_loop_profile}
+% \end{figure}
+
+
+\subsection{Closed-Loop}
+\label{subsec:district_closed_loop_results}
+
+For the closed-loop simulation, a prediction horizon of
+
+\begin{equation}
+    N=12
+\end{equation}
+
+was used, corresponding to \(6\,\mathrm{h}\). In contrast to the open-loop
+case, the controller does not receive the future ambient-temperature
+trajectory. At each sampling instant, only the currently available ambient
+temperature is used and is assumed to remain constant over the prediction
+horizon.
+
+A separate MPC optimization is performed for every Monte Carlo realization.
+Consequently, each trajectory obtains its own optimal \(U^\ast\) and
+\(V^\ast\) sequences according to its current state estimate. Only the first
+elements of these sequences are applied, after which a new measurement is
+received and the optimization is repeated.
+
+When a new ambient-temperature value becomes available, the Kalman-filter
+state prediction is corrected using the ambient-temperature re-basing term.
+The corrected state estimate is then used by the subsequent MPC problem.
+This allows the controller to respond to the actual ambient-temperature
+change without assuming its future value beforehand.
+
+
+
+% Example figure:
+%
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]
+%     {closed_loop_physical_summary.png}
+%     \caption{Closed-loop Monte Carlo results for the single-pipe district
+%     heating system.}
+%     \label{fig:district_closed_loop}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]
+%     {closed_loop_z_profile.png}
+%     \caption{Closed-loop temperature propagation along the pipe.}
+%     \label{fig:district_closed_loop_profile}
+% \end{figure}

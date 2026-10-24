@@ -1,0 +1,26 @@
+% =====================================================================
+%  main.tex — OPTIONAL PDF preview of all website texts.
+%  The website does not use this file; it only lets you compile the
+%  content in Overleaf/LaTeX to proof-read it. Upload the whole
+%  "content" folder to Overleaf and compile this file.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{portfolio}
+
+\begin{document}
+\input{site}
+
+\section*{Home}
+\input{pages/home}
+
+\section*{Background}
+\input{pages/background}
+
+\input{pages/projects}
+\input{projects/district-heating-mpc/project}
+\input{projects/haptic-navigation-mpc/project}
+
+\input{pages/interests}
+\input{pages/contact}
+\end{document}

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.DS_Store
+# LaTeX build files
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+content/main.pdf
+
+.venv/
+_to_delete/
+update.tgz
+preview.html
+content/pages/interest_images/
