@@ -51,7 +51,6 @@ export function accentOf(D, key) {
 
 export function pageTitle(D, route) {
   const name = stripTags(D.site.name);
-  if (route.key === 'home') return D.site.title;
   if (route.key === 'project') {
     const p = D.projects.find((x) => x.slug === route.slug);
     return p ? `${stripTags(p.title)} · ${name}` : name;

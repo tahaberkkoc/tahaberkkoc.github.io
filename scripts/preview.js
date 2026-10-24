@@ -46,7 +46,7 @@ const css = fs.readFileSync(path.join(DIST, 'assets/styles/main.css'), 'utf8');
 
 const html = `<!doctype html>
 <html lang="${D.site.lang || 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${D.site.title.replace(/<[^>]*>/g, '')}</title>
+<title>Home · ${D.site.name.replace(/<[^>]*>/g, "")}</title>
 <link rel="icon" type="image/png" href="data:image/png;base64,${fs.readFileSync(path.join(ROOT, 'public/favicon.png')).toString('base64')}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap">
 <style>${katex}\n${css}</style></head>
