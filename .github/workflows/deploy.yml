@@ -26,7 +26,7 @@ jobs:
           node-version: 20
       - id: pages
         uses: actions/configure-pages@v5
-      - run: sudo apt-get install -y poppler-utils   # converts PDF figures to PNG
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils   # converts PDF figures to PNG
       - run: npm install
       - run: npm run build
         env:
