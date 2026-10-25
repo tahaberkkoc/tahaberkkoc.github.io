@@ -130,14 +130,14 @@ html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .
 html.js .reveal.in { opacity: 1; transform: none; }
 
 /* links inside text: colored underline in the page's accent */
-.prose a, .entry-title a, .read-more, .back-link, .contact-links a .link-label, .inline-link {
+.prose a, .entry-title a, .entry-role a, .read-more, .back-link, .contact-links a .link-label, .inline-link {
   color: inherit; text-decoration: none;
   background-image: linear-gradient(var(--accent), var(--accent));
   background-repeat: no-repeat; background-position: 0 100%; background-size: 100% 2px;
   transition: background-size .25s var(--ease-out), color .2s;
   padding-bottom: 1px;
 }
-.prose a:hover, .entry-title a:hover, .read-more:hover, .back-link:hover, .contact-links a:hover .link-label, .inline-link:hover {
+.prose a:hover, .entry-title a:hover, .entry-role a:hover, .read-more:hover, .back-link:hover, .contact-links a:hover .link-label, .inline-link:hover {
   background-image: linear-gradient(color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--accent) 28%, transparent));
   background-size: 100% 100%;
 }
@@ -606,7 +606,7 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 .preview-desc .project-credits { margin: 0 0 12px; font-size: 14px; }
 
 /* links inside project summaries use the Home red */
-.preview-summary a, .project-mobile a, .doc-body > .prose a { --accent: #ff3131; }
+.preview-summary a, .project-mobile a, .doc-body > .prose a, .entry-role a { --accent: #ff3131; }
 
 /* ------------------------------------------------------------------ INTERESTS: gallery + inline list */
 .gallery { position: relative; margin: 30px 0 0 var(--indent); max-width: 1090px; }

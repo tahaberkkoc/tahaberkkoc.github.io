@@ -99,10 +99,10 @@ export function background(D) {
       const title = e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener">${e.title}</a>` : e.title;
       const sub = (e.location || e.note)
         ? `<div class="entry-sub"><span class="entry-loc">${e.location}</span>${e.note ? `<span class="entry-note">${e.note}</span>` : ''}</div>` : '';
-      const roles = e.roles.map((r) => `<p class="entry-role">${r}</p>`).join('');
+      const roles = e.roles.map((r) => `<p class="entry-role">${fixLinks(D, r)}</p>`).join('');
       const list = (items) => items.length ? `<ul class="entry-highlights">${items.map((x) => `<li>${x}</li>`).join('')}</ul>` : '';
       const subs = (e.subs || []).map((s) => `
-          <div class="entry-also"><span class="entry-role">${s.name}</span>${s.date ? `<span class="entry-date">${s.date}</span>` : ''}</div>${list(s.highlights)}`).join('');
+          <div class="entry-also"><span class="entry-role">${fixLinks(D, s.name)}</span>${s.date ? `<span class="entry-date">${s.date}</span>` : ''}</div>${list(s.highlights)}`).join('');
       const hl = list(e.highlights) + subs;
       return `
         <article class="entry reveal${e.kind === 'job' ? ' is-job' : ''}">
