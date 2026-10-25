@@ -233,10 +233,10 @@ export function interests(D) {
   return `
   <div class="interests-page">
     <h1 class="page-title" style="--sec:${I.titleColor || accentOf(D, 'interests')}"><span>${I.title}</span></h1>
-    ${I.intro ? `<div class="page-intro prose">${I.intro}</div>` : ''}
-    <div class="gallery">${gallery}</div>
     <ul class="interest-inline">${inline}
     </ul>
+    ${I.intro ? `<div class="page-intro gallery-intro prose">${I.intro}</div>` : ''}
+    <div class="gallery">${gallery}</div>
   </div>`;
 }
 
