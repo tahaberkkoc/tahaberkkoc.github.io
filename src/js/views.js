@@ -191,7 +191,8 @@ export function projects(D) {
 export function project(D, p, doc) {
   const L = D.projectsPage.labels;
   const tags = p.tags.length ? `<ul class="tags">${p.tags.map((t) => `<li>${t}</li>`).join('')}</ul>` : '';
-  const links = p.links.length ? `<div class="project-links">${p.links.map((l) => `<a class="btn-link" href="${esc(l.url)}" target="_blank" rel="noopener">${l.label} ${icon(D, 'arrow-up-right')}</a>`).join('')}</div>` : '';
+  const pdf = p.pdf ? `<a class="download-btn" href="${esc(p.pdf.href)}" download="${esc(p.pdf.name)}">${icon(D, 'download')}<span>${p.pdf.label}</span></a>` : '';
+  const links = p.links.length || p.pdf ? `<div class="project-links">${pdf}${p.links.map((l) => `<a class="btn-link" href="${esc(l.url)}" target="_blank" rel="noopener">${l.label} ${icon(D, 'arrow-up-right')}</a>`).join('')}</div>` : '';
   const toc = doc && doc.toc.length > 1 ? `
       <aside class="doc-toc" aria-label="${esc(stripTags(L.contents || 'Contents'))}">
         <button type="button" class="toc-title toc-collapse" aria-expanded="false"><span>${L.contents || 'Contents'}</span>${icon(D, 'chevron-down')}</button>

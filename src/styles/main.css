@@ -672,3 +672,6 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 .lightbox .lb-next { right: 12px; top: 50%; transform: translateY(-50%); }
 .lightbox .lb-count { position: absolute; top: 22px; left: 22px; color: #bbb; font-size: 13px; letter-spacing: .08em; }
 @media (max-width: 700px) { .lightbox { padding: 56px 8px 70px; } .lightbox .lb-prev { top: auto; bottom: 14px; left: 22%; transform: none; } .lightbox .lb-next { top: auto; bottom: 14px; right: 22%; transform: none; } }
+
+/* download button inside a project header sits in the flow, next to the other buttons */
+.project-links .download-btn { position: static; margin: 0; }

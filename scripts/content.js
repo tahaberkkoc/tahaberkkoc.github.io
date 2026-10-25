@@ -256,6 +256,14 @@ export function loadContent(root, { warn = () => {}, resolveAsset }) {
         return '';
       },
       ProjectLink: (s, rr) => { p.links.push({ label: inlineArg(s, rr), url: plain(s.arg() || []) }); return ''; },
+      ProjectPDF: (s, rr) => {
+        const rel = plainArg(s);
+        const label = inlineArg(s, rr);
+        const a = resolveAsset(dir, rel, [''], `projects/${slug}`, true);
+        if (!a) warn(`projects/${slug}: download file not found: ${rel}`);
+        else p.pdf = { href: a.url, label, name: rel.split('/').pop() };
+        return '';
+      },
       ProjectDocument: (s) => { p.document = plainArg(s); return ''; },
       ProjectStatus: (s, rr) => { p.status = inlineArg(s, rr); return ''; },
       ProjectHidden: () => { p.hidden = true; return ''; },
