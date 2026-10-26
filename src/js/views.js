@@ -198,7 +198,7 @@ export function project(D, p, doc) {
         <button type="button" class="toc-title toc-collapse" aria-expanded="false"><span>${L.contents || 'Contents'}</span>${icon(D, 'chevron-down')}</button>
         <div class="toc-body"><ol>${tocHtml(D, doc.toc)}</ol></div>
       </aside>` : '';
-  const body = fixLinks(D, doc ? doc.html : `<div class="prose">${p.summary}</div>`);
+  const body = doc ? fixLinks(D, doc.html) : '';
   return `
   <article class="project-page">
     <a class="back-link" href="${url(D, 'projects/')}">${icon(D, 'arrow-left')} ${L.back || 'Projects'}</a>
@@ -209,7 +209,7 @@ export function project(D, p, doc) {
       ${tags}${links}
     </header>
     ${p.cover ? `<figure class="project-cover"><img decoding="async" src="${esc(p.cover)}" alt=""></figure>` : ''}
-    ${doc && p.summary ? `<section class="doc-abstract project-summary prose"><h2 class="abstract-title">Overview</h2>${fixLinks(D, p.summary)}</section>` : ''}
+    ${p.summary ? `<section class="doc-abstract project-summary prose"><h2 class="abstract-title">Overview</h2>${fixLinks(D, p.summary)}</section>` : ''}
     <div class="doc-layout${toc ? ' has-toc' : ''}">
       <div class="doc-body prose">${body}</div>${toc}
     </div>
