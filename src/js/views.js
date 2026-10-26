@@ -208,7 +208,6 @@ export function project(D, p, doc) {
       ${creditsHtml(p)}
       ${tags}${links}
     </header>
-    ${doc && p.summary ? `<div class="project-summary prose">${fixLinks(D, p.summary)}</div>` : ''}
     ${p.cover ? `<figure class="project-cover"><img decoding="async" src="${esc(p.cover)}" alt=""></figure>` : ''}
     <div class="doc-layout${toc ? ' has-toc' : ''}">
       <div class="doc-body prose">${body}</div>${toc}

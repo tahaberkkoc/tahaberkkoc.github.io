@@ -289,10 +289,6 @@ export function loadContent(root, { warn = () => {}, resolveAsset }) {
         src = src.replace(/(\\begin\{document\})([\s\S]*?\\clearpage)/, (m, a, b) => (/\\(chapter|section)/.test(b) ? m : a));
         src = src.replace(/\\begin\{titlepage\}[\s\S]*?\\end\{titlepage\}/, '');
       }
-      // the abstract is replaced on the web by the project summary shown at the top of the page
-      src = src.replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, '');
-      src = src.replace(/\\include\{[^}]*(?:[Ss]ummary|[Aa]bstract)\}[ \t]*\r?\n?/g, '');
-      src = src.replace(/\\chapterx\{ABSTRACT\}[\s\S]*?\\clearpage/, '');
       if (p.abstractFirst) {
         // web only: show the abstract before the acknowledgments
         const blk = (name) => { const a = src.indexOf(`\\chapterx{${name}}`); if (a < 0) return null; const c = src.indexOf('\\clearpage', a); return c < 0 ? null : [a, c + '\\clearpage'.length]; };

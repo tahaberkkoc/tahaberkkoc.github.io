@@ -678,8 +678,3 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 
 /* interests: the list comes first, the gallery heading is bold */
 .gallery-intro { margin-top: 34px; font-weight: 700; color: var(--ink); }
-
-/* project page: the short description from the Projects list comes first */
-.project-summary { max-width: 760px; margin: 22px 0 6px; font-size: var(--text-lg, 1.1rem); line-height: 1.6; color: var(--ink); }
-.project-summary p { margin: 0 0 .6em; }
-.project-summary a { --accent: #ff3131; }
