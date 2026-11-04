@@ -129,13 +129,13 @@ export function background(D) {
 const creditsHtml = (p) => (p.authors || p.target || (p.supervisors && p.supervisors.length) ? `<div class="project-credits">${p.authors ? `<p class="project-authors">${p.authors}</p>` : ''}${(p.supervisors || []).map((x) => `<p class="project-supervisor"><span>${x.role}</span> ${x.name}</p>`).join('')}${p.target ? `<p class="project-supervisor project-target"><span>Target:</span> ${p.target}</p>` : ''}</div>` : '');
 
 // \href{project:slug}{text} in LaTeX points at another project page
-// project:slug links -> real URLs; in project texts (colored) a link to a project outside the first group (e.g. coursework) takes that group's color
+// project:slug links -> real URLs; in project texts (colored) a link to another project takes the color of that project's group (Research blue, Coursework purple)
 const fixLinks = (D, html, colored = false) => String(html || '').replace(/href="project:([\w-]+)"/g, (_, slug) => {
   if (!colored) return `href="${url(D, `projects/${slug}/`)}"`;
   const p = (D.projects || []).find((x) => x.slug === slug);
   const cats = (D.projectsPage && D.projectsPage.categories) || [];
   const i = p ? cats.findIndex((c) => c.key === p.category) : -1;
-  const color = i > 0 ? cats[i].color : '';
+  const color = i >= 0 ? cats[i].color : '';
   return `href="${url(D, `projects/${slug}/`)}"${color ? ` style="--accent:${color}"` : ''}`;
 });
 
