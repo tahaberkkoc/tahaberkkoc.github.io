@@ -27,8 +27,8 @@
   --brand-scale: .625;
   --nav-size: clamp(16px, 1.55vw, 21px);
   --h-section: clamp(23px, 2.2vw, 30px);
-  --text: clamp(15.5px, 1.2vw, 17px);
-  --text-sm: clamp(14px, 1.08vw, 15.5px);
+  --text: clamp(16.5px, 1.3vw, 18.5px);
+  --text-sm: clamp(15px, 1.18vw, 17px);
   --header-h: 84px;
 }
 
@@ -220,7 +220,7 @@ body[data-page="home"]:not(.nav-busy) .site-main { max-width: 2200px; }
 .entry-also { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 24px; flex-wrap: wrap; margin-top: 14px; }
 .entry-also .entry-role { margin: 0; font-weight: 700; }
 .entry-also .entry-date { font-size: clamp(15px, 1.3vw, 18px); }
-.entry-highlights { margin: 10px 0 0; padding: 0; list-style: none; font-size: var(--text-sm); line-height: 1.55; }
+.entry-highlights { margin: 10px 0 0; padding: 0; list-style: none; font-size: var(--text); line-height: 1.55; }
 .entry-highlights li { position: relative; padding-left: 20px; margin-top: 5px; color: var(--ink-2); }
 .entry-highlights li::before {
   content: ''; position: absolute; left: 2px; top: .58em; width: 9px; height: 6px;
@@ -352,7 +352,7 @@ a.preview-photo:has(.photo-placeholder), .preview-photo:has(.photo-placeholder) 
 .toc-num { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
 
 /* LaTeX document typography */
-.doc-body { font-size: clamp(16px, 1.25vw, 17.5px); line-height: 1.72; color: var(--ink-2); }
+.doc-body { font-size: clamp(17px, 1.38vw, 19px); line-height: 1.72; color: var(--ink-2); }
 .doc-body > p, .doc-body p { margin: 0 0 1em; }
 .doc-heading { scroll-margin-top: 96px; }
 .doc-body h2 { font-size: clamp(22px, 1.9vw, 27px); font-weight: 700; margin: 2em 0 .6em; line-height: 1.25; color: var(--ink); }
@@ -465,7 +465,7 @@ html.js .interest-card.reveal.in:hover, .interest-card:hover { transform: transl
   display: grid; grid-template-columns: minmax(0, 412px) minmax(0, 682px);
   column-gap: clamp(40px, 9.2vw, 126px); margin: 40px 0 0 clamp(0px, 4.4vw, 60px); align-items: start;
 }
-.contact-intro { border-left: 4px solid var(--soft-blue); padding-left: 10px; font-size: var(--text-sm); line-height: 1.55; }
+.contact-intro { border-left: 4px solid var(--soft-blue); padding-left: 10px; font-size: var(--text); line-height: 1.55; }
 .contact-intro p:last-child { margin: 0; }
 .contact-links { list-style: none; margin: 46px 0 0; padding: 0; display: grid; gap: 22px; }
 .contact-links li { display: flex; align-items: center; gap: 8px; }
@@ -603,7 +603,7 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
   line-height: 1.5; margin-left: 4px;
 }
 .preview-date .status-badge, .project-date .status-badge { margin: 0 8px 0 0; }
-.preview-desc .project-credits { margin: 0 0 12px; font-size: 14px; }
+.preview-desc .project-credits { margin: 0 0 12px; font-size: 15px; }
 
 /* links inside project summaries use the Home red */
 .preview-summary a, .project-mobile a, .doc-body > .prose a, .entry-role a { --accent: #ff3131; }
