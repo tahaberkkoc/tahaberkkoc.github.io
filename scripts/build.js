@@ -206,6 +206,9 @@ export async function build({ dev = false, quiet = false } = {}) {
   const favHash = hashOf(['favicon.svg', 'favicon.png', 'apple-touch-icon.png'].map((f) => path.join(PUBLIC, f)).filter((f) => fs.existsSync(f)));
   const json = JSON.stringify(data).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const stripTags = (h) => String(h || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  // GoatCounter visit counter: only in the published site, never in the local preview
+  const analytics = !dev && data.site.goatcounter
+    ? `<script data-goatcounter="https://${data.site.goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '';
   const reload = dev ? `<script>new EventSource('${base}__reload').onmessage = () => location.reload();</script>` : '';
 
   const writePage = (route, outFile) => {
@@ -226,7 +229,7 @@ export async function build({ dev = false, quiet = false } = {}) {
       .replace('{{main}}', () => views.renderRoute(data, route, doc))
       .replace('{{data}}', () => json)
       .replace('{{doc}}', () => (doc ? JSON.stringify({ slug: route.slug, html: doc.html, toc: doc.toc }).replace(/</g, '\\u003c') : 'null'))
-      .replace('{{devscript}}', reload);
+      .replace('{{devscript}}', reload + analytics);
     const dest = path.join(DIST, outFile);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(dest, html);

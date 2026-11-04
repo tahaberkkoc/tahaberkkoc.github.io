@@ -85,6 +85,8 @@ async function go(url, { push = true } = {}) {
   if (push) history.pushState({}, '', target.href);
   current = route;
   main.dataset.view = route.key;
+  // count the page change in GoatCounter (the first page load is counted by its own script)
+  if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: location.pathname, title: document.title });
 
   window.scrollTo(0, 0);
   main.classList.remove('is-leaving');

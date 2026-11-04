@@ -60,8 +60,10 @@ export function loadContent(root, { warn = () => {}, resolveAsset }) {
   run('site.tex', {
     SiteName: (s, r) => { site.name = inlineArg(s, r); return ''; },
     SiteTitle: (s) => { site.title = plainArg(s).replace(/~/g, '~'); return ''; },
-    SiteDescription: (s) => { site.description = plainArg(s); return ''; },
+    SiteDescription: (s) => { site.description = plainArg(s).replace(/\\([&%$#_])/g, '$1'); return ''; },
     SiteLanguage: (s) => { site.lang = plainArg(s); return ''; },
+    // \GoatCounter{code}: cookie-free visit counter, dashboard at https://code.goatcounter.com
+    GoatCounter: (s) => { site.goatcounter = plainArg(s).trim().toLowerCase().replace(/[^a-z0-9-]/g, ''); return ''; },
     Social: (s, r) => {
       const icon = plainArg(s);
       const url = plain(s.arg() || []).replace(/\\([#%&_~])/g, '$1');
