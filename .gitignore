@@ -18,3 +18,36 @@ _to_delete/
 update.tgz
 preview.html
 content/pages/interest_images/
+
+# local notes (the old detailed README)
+NOTES.md
+
+# ---- files the website does not use: kept on this computer, not on GitHub ----
+content/assets/gallery/dji_mimo_20241002_124536_0_1727840844166_photo.jpg
+# Risk-aware conformal MPC (summary only for now): keep only project.tex and the cover
+content/projects/CP_MPC_Haptic_Navigation_Proposal/*
+!content/projects/CP_MPC_Haptic_Navigation_Proposal/project.tex
+!content/projects/CP_MPC_Haptic_Navigation_Proposal/figs/
+content/projects/CP_MPC_Haptic_Navigation_Proposal/figs/*
+!content/projects/CP_MPC_Haptic_Navigation_Proposal/figs/h2_tree.png
+# Haptic vest (summary only for now): keep only project.tex and the cover
+content/projects/haptic_survey/*
+!content/projects/haptic_survey/project.tex
+!content/projects/haptic_survey/Admin_view_visualization.png
+# EE 475: intermediate results not shown in the report
+content/projects/EE_475_Project_Final_Report/*/admm/admm_*.png
+!content/projects/EE_475_Project_Final_Report/*/admm/admm_03.png
+!content/projects/EE_475_Project_Final_Report/*/admm/admm_10.png
+content/projects/EE_475_Project_Final_Report/*/eval_progress/*
+!content/projects/EE_475_Project_Final_Report/*/eval_progress/radial_fft_overlay_blur_admm01_admm05_final.png
+# DTU report: files only needed to compile the PDF
+content/projects/DTU_Internship_Report-4/README.rst
+content/projects/DTU_Internship_Report-4/Thesis.tex
+content/projects/DTU_Internship_Report-4/makefile
+content/projects/DTU_Internship_Report-4/bibliography/
+content/projects/DTU_Internship_Report-4/preamble/
+content/projects/DTU_Internship_Report-4/prefrontmatter/
+content/projects/DTU_Internship_Report-4/frontmatter/Preface.tex
+content/projects/DTU_Internship_Report-4/chapters/*_referance.tex
+content/projects/DTU_Internship_Report-4/graphics/DTU-*.pdf
+content/projects/DTU_Internship_Report-4/graphics/Signature.pdf
