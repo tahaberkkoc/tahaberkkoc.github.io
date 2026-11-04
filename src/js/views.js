@@ -129,7 +129,15 @@ export function background(D) {
 const creditsHtml = (p) => (p.authors || p.target || (p.supervisors && p.supervisors.length) ? `<div class="project-credits">${p.authors ? `<p class="project-authors">${p.authors}</p>` : ''}${(p.supervisors || []).map((x) => `<p class="project-supervisor"><span>${x.role}</span> ${x.name}</p>`).join('')}${p.target ? `<p class="project-supervisor project-target"><span>Target:</span> ${p.target}</p>` : ''}</div>` : '');
 
 // \href{project:slug}{text} in LaTeX points at another project page
-const fixLinks = (D, html) => String(html || '').replace(/href="project:([\w-]+)"/g, (_, slug) => `href="${url(D, `projects/${slug}/`)}"`);
+// project:slug links -> real URLs; in project texts (colored) a link to a project outside the first group (e.g. coursework) takes that group's color
+const fixLinks = (D, html, colored = false) => String(html || '').replace(/href="project:([\w-]+)"/g, (_, slug) => {
+  if (!colored) return `href="${url(D, `projects/${slug}/`)}"`;
+  const p = (D.projects || []).find((x) => x.slug === slug);
+  const cats = (D.projectsPage && D.projectsPage.categories) || [];
+  const i = p ? cats.findIndex((c) => c.key === p.category) : -1;
+  const color = i > 0 ? cats[i].color : '';
+  return `href="${url(D, `projects/${slug}/`)}"${color ? ` style="--accent:${color}"` : ''}`;
+});
 
 export function projectPreview(D, p) {
   if (!p) return '';
@@ -143,7 +151,7 @@ export function projectPreview(D, p) {
       <div class="preview-desc"${gc ? ` style="--gc:${gc}"` : ''}>
         ${p.date || p.status ? `<p class="preview-date">${p.status ? `<span class="status-badge">${p.status}</span> ` : ''}${p.date || ''}</p>` : ''}
         ${creditsHtml(p)}
-        <div class="preview-summary prose">${fixLinks(D, p.summary)}</div>
+        <div class="preview-summary prose">${fixLinks(D, p.summary, true)}</div>
         ${tags}
         <a class="read-more" href="${url(D, `projects/${p.slug}/`)}">${L.readmore || 'Read more'} ${icon(D, 'arrow-right')}</a>
       </div>
@@ -169,7 +177,7 @@ export function projects(D) {
         </a>
         <div class="project-mobile">
           ${p.cover ? `<img decoding="async" src="${esc(p.cover)}" alt="" loading="lazy">` : ''}
-          <div class="prose">${fixLinks(D, p.summary)}</div>
+          <div class="prose">${fixLinks(D, p.summary, true)}</div>
           <a class="read-more" href="${url(D, `projects/${p.slug}/`)}">${D.projectsPage.labels.readmore || 'Read more'} ${icon(D, 'arrow-right')}</a>
         </div>
       </li>`; };
@@ -198,7 +206,7 @@ export function project(D, p, doc) {
         <button type="button" class="toc-title toc-collapse" aria-expanded="false"><span>${L.contents || 'Contents'}</span>${icon(D, 'chevron-down')}</button>
         <div class="toc-body"><ol>${tocHtml(D, doc.toc)}</ol></div>
       </aside>` : '';
-  const body = fixLinks(D, doc ? doc.html : `<div class="prose">${p.summary}</div>`);
+  const body = fixLinks(D, doc ? doc.html : `<div class="prose">${p.summary}</div>`, true);
   return `
   <article class="project-page">
     <a class="back-link" href="${url(D, 'projects/')}">${icon(D, 'arrow-left')} ${L.back || 'Projects'}</a>

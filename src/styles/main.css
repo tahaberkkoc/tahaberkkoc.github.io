@@ -606,7 +606,8 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 .preview-desc .project-credits { margin: 0 0 12px; font-size: 15px; }
 
 /* links inside project summaries use the Home red */
-.preview-summary a, .project-mobile a, .doc-body > .prose a, .entry-role a { --accent: #ff3131; }
+.entry-role a { --accent: #ff3131; }
+.preview-summary a, .project-mobile a, .doc-body > .prose a { --accent: #22c4e1; }
 
 /* ------------------------------------------------------------------ INTERESTS: gallery + inline list */
 .gallery { position: relative; margin: 30px 0 0 var(--indent); max-width: 1090px; }
