@@ -266,6 +266,7 @@ export function loadContent(root, { warn = () => {}, resolveAsset }) {
       },
       ProjectDocument: (s) => { p.document = plainArg(s); return ''; },
       ProjectStatus: (s, rr) => { p.status = inlineArg(s, rr); return ''; },
+      ProjectTarget: (s, rr) => { p.target = inlineArg(s, rr); return ''; },
       ProjectHidden: () => { p.hidden = true; return ''; },
       ProjectAuthors: (s, rr) => { p.authors = inlineArg(s, rr); return ''; },
       ProjectSupervisor: (s, rr) => { (p.supervisors = p.supervisors || []).push({ role: inlineArg(s, rr), name: inlineArg(s, rr) }); return ''; },

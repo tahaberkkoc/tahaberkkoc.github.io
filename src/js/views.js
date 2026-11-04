@@ -126,7 +126,7 @@ export function background(D) {
   return `<div class="bg-page">${title}${dl}${sections}</div>`;
 }
 
-const creditsHtml = (p) => (p.authors || (p.supervisors && p.supervisors.length) ? `<div class="project-credits">${p.authors ? `<p class="project-authors">${p.authors}</p>` : ''}${(p.supervisors || []).map((x) => `<p class="project-supervisor"><span>${x.role}</span> ${x.name}</p>`).join('')}</div>` : '');
+const creditsHtml = (p) => (p.authors || p.target || (p.supervisors && p.supervisors.length) ? `<div class="project-credits">${p.authors ? `<p class="project-authors">${p.authors}</p>` : ''}${(p.supervisors || []).map((x) => `<p class="project-supervisor"><span>${x.role}</span> ${x.name}</p>`).join('')}${p.target ? `<p class="project-supervisor project-target"><span>Target:</span> ${p.target}</p>` : ''}</div>` : '');
 
 // \href{project:slug}{text} in LaTeX points at another project page
 const fixLinks = (D, html) => String(html || '').replace(/href="project:([\w-]+)"/g, (_, slug) => `href="${url(D, `projects/${slug}/`)}"`);
