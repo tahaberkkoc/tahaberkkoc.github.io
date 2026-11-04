@@ -96,9 +96,9 @@ export function background(D) {
   const b = D.background;
   const sections = b.sections.map((sec) => {
     const entries = sec.entries.map((e) => {
-      const title = e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener">${e.title}</a>` : e.title;
+      const title = e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener">${e.title}</a>` : fixLinks(D, e.title);
       const sub = (e.location || e.note)
-        ? `<div class="entry-sub"><span class="entry-loc">${e.location}</span>${e.note ? `<span class="entry-note">${e.note}</span>` : ''}</div>` : '';
+        ? `<div class="entry-sub"><span class="entry-loc">${fixLinks(D, e.location)}</span>${e.note ? `<span class="entry-note">${e.note}</span>` : ''}</div>` : '';
       const roles = e.roles.map((r) => `<p class="entry-role">${fixLinks(D, r)}</p>`).join('');
       const list = (items) => items.length ? `<ul class="entry-highlights">${items.map((x) => `<li>${x}</li>`).join('')}</ul>` : '';
       const subs = (e.subs || []).map((s) => `
