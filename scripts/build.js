@@ -200,6 +200,9 @@ export async function build({ dev = false, quiet = false } = {}) {
   const views = await import(pathToFileURL(path.join(SRC, 'js', 'views.js')).href + `?t=${Date.now()}`);
   const template = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
   const version = hashOf([path.join(SRC, 'styles', 'main.css'), path.join(SRC, 'js', 'app.js'), path.join(SRC, 'js', 'views.js')]);
+  // app.js imports views.js: give that import the same version, so browsers never mix a new app.js with an old views.js
+  const appOut = path.join(DIST, 'assets', 'js', 'app.js');
+  fs.writeFileSync(appOut, fs.readFileSync(appOut, 'utf8').replace(/from '\.\/views\.js'/g, `from './views.js?v=${version}'`));
   const favHash = hashOf(['favicon.svg', 'favicon.png', 'apple-touch-icon.png'].map((f) => path.join(PUBLIC, f)).filter((f) => fs.existsSync(f)));
   const json = JSON.stringify(data).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const stripTags = (h) => String(h || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
