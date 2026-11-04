@@ -678,3 +678,7 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 
 /* interests: the list comes first, the gallery heading is bold */
 .gallery-intro { margin-top: 34px; font-weight: 700; color: var(--ink); }
+
+/* home: bold + italic phrases (\textbf{\textit{...}}) are a little lighter than plain bold */
+.about strong:has(> em:only-child), .about em:has(> strong:only-child) { font-weight: 600; }
+.about em > strong:only-child { font-weight: inherit; }
