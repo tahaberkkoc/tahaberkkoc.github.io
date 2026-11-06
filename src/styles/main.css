@@ -208,6 +208,8 @@ body[data-page="home"]:not(.nav-busy) .site-main { max-width: 2200px; }
 .entries { margin: 20px 0 0 var(--indent); max-width: 1090px; }
 .entry { padding: 12px 0 16px; border-bottom: 1px solid var(--sec); }
 .entry + .entry { margin-top: 10px; }
+/* dividers only between the items of a section, not after the last one */
+.entries > .entry:last-child, .entries > .skill-group:last-child { border-bottom: 0; }
 .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 24px; flex-wrap: wrap; }
 .entry-title { font-size: clamp(18px, 1.6vw, 22px); font-weight: 700; color: var(--blue); line-height: 1.3; --accent: var(--sec); }
 .entry-date { font-style: italic; color: var(--muted-2); font-size: clamp(16px, 1.45vw, 20px); white-space: nowrap; }
