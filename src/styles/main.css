@@ -156,6 +156,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
   grid-template-columns: minmax(0, 33fr) minmax(0, 64fr);
   align-items: end;
   align-content: center;
+  column-gap: clamp(20px, 2.6vw, 48px);   /* space between the photo and the text (Hi + about) */
   min-height: calc(100svh - var(--header-h) - 120px);
   padding: 4vh clamp(16px, 2.4vw, 34px) 120px clamp(0px, .7vw, 10px);
 }
