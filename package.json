@@ -11,9 +11,9 @@
     "pdf": "cd content && latexmk -pdf -interaction=nonstopmode main.tex"
   },
   "engines": {
-    "node": ">=18.11"
+    "node": ">=20"
   },
   "dependencies": {
-    "katex": "^0.16.11"
+    "katex": "^0.19.0"
   }
 }

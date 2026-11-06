@@ -211,12 +211,35 @@ export async function build({ dev = false, quiet = false } = {}) {
     ? `<script data-goatcounter="https://${data.site.goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '';
   const reload = dev ? `<script>new EventSource('${base}__reload').onmessage = () => location.reload();</script>` : '';
 
+  // Content-Security-Policy for the published site: the browser only runs this site's own scripts
+  // (plus the visit counter) and only talks to the contact-form service and the counter
+  const sha = (code) => `'sha256-${crypto.createHash('sha256').update(code).digest('base64')}'`;
+  const inlineScripts = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => sha(m[1]));
+  const originOf = (u) => { try { return new URL(u).origin; } catch { return ''; } };
+  const formOrigin = originOf(content.contact.endpoint || '');
+  const counter = data.site.goatcounter ? `https://${data.site.goatcounter}.goatcounter.com` : '';
+  const csp = dev ? '' : [
+    "default-src 'self'",
+    ["script-src 'self'", ...inlineScripts, counter && 'https://gc.zgo.at'].filter(Boolean).join(' '),
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: https:",
+    ["connect-src 'self'", formOrigin, counter].filter(Boolean).join(' '),
+    ["form-action 'self' mailto:", formOrigin].filter(Boolean).join(' '),
+    "object-src 'none'",
+    "frame-src 'none'",
+    "base-uri 'self'",
+    'upgrade-insecure-requests',
+  ].join('; ');
+  const securityMeta = dev ? '' : `<meta http-equiv="Content-Security-Policy" content="${csp}">\n  <meta name="referrer" content="strict-origin-when-cross-origin">\n  `;
+
   const writePage = (route, outFile) => {
     const doc = route.key === 'project' ? docs[route.slug] : null;
     const navKey = views.navKey(route);
     const p = route.key === 'project' ? content.projects.find((x) => x.slug === route.slug) : null;
     const description = p ? stripTags(p.summary).slice(0, 200) : content.site.description;
     const html = template
+      .replace('<meta charset="utf-8">', () => `<meta charset="utf-8">\n  ${securityMeta}`.trimEnd())
       .replace(/{{lang}}/g, content.site.lang || 'en')
       .replace(/{{title}}/g, stripTags(views.pageTitle(data, route)).replace(/"/g, '&quot;'))
       .replace(/{{description}}/g, description.replace(/"/g, '&quot;'))

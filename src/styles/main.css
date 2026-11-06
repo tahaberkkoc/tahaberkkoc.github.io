@@ -130,14 +130,14 @@ html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .
 html.js .reveal.in { opacity: 1; transform: none; }
 
 /* links inside text: colored underline in the page's accent */
-.prose a, .entry-title a, .entry-role a, .read-more, .back-link, .contact-links a .link-label, .inline-link {
+.prose a, .entry-title a, .entry-role a, .entry-loc a, .entry-highlights a, .read-more, .back-link, .contact-links a .link-label, .inline-link {
   color: inherit; text-decoration: none;
   background-image: linear-gradient(var(--accent), var(--accent));
   background-repeat: no-repeat; background-position: 0 100%; background-size: 100% 2px;
   transition: background-size .25s var(--ease-out), color .2s;
   padding-bottom: 1px;
 }
-.prose a:hover, .entry-title a:hover, .entry-role a:hover, .read-more:hover, .back-link:hover, .contact-links a:hover .link-label, .inline-link:hover {
+.prose a:hover, .entry-title a:hover, .entry-role a:hover, .entry-loc a:hover, .entry-highlights a:hover, .read-more:hover, .back-link:hover, .contact-links a:hover .link-label, .inline-link:hover {
   background-image: linear-gradient(color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--accent) 28%, transparent));
   background-size: 100% 100%;
 }
