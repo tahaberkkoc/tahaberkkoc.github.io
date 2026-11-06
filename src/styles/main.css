@@ -608,7 +608,8 @@ html.has-cursor input, html.has-cursor textarea, html.has-cursor select { cursor
 .preview-desc .project-credits { margin: 0 0 12px; font-size: 15px; }
 
 /* links inside project summaries use the Home red */
-.entry-role a { --accent: #ff3131; }
+.entry-role a, .entry-loc a, .entry-highlights a { --accent: #ff3131; }
+#communities .entry-loc a { --accent: inherit; }   /* Vision of Hope keeps the page color */
 .preview-summary a, .project-mobile a, .doc-body > .prose a { --accent: #22c4e1; }
 
 /* ------------------------------------------------------------------ INTERESTS: gallery + inline list */
