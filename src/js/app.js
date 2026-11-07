@@ -401,6 +401,25 @@ function initCursor() {
   document.addEventListener('pointerdown', () => dot.classList.add('down'));
   document.addEventListener('pointerup', () => dot.classList.remove('down'));
   document.documentElement.addEventListener('pointerleave', () => { shown = false; dot.classList.remove('on'); });
+
+  // When the page is zoomed in (trackpad pinch or browser zoom), the dot can drift away from the real
+  // pointer, so the normal system cursor is used instead until the zoom is back to normal.
+  const baseRatio = window.devicePixelRatio || 1;
+  const zoomed = () => {
+    const vv = window.visualViewport;
+    return (vv && Math.abs(vv.scale - 1) > 0.01) || Math.abs((window.devicePixelRatio || 1) - baseRatio) > 0.01;
+  };
+  const syncZoom = () => {
+    const z = zoomed();
+    document.documentElement.classList.toggle('has-cursor', !z);
+    dot.style.display = z ? 'none' : '';
+    if (z) { shown = false; dot.classList.remove('on'); }
+  };
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncZoom);
+    window.visualViewport.addEventListener('scroll', syncZoom);
+  }
+  window.addEventListener('resize', syncZoom);
 }
 
 // ------------------------------------------------------------------ boot
