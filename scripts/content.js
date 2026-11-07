@@ -64,6 +64,12 @@ export function loadContent(root, { warn = () => {}, resolveAsset }) {
     SiteLanguage: (s) => { site.lang = plainArg(s); return ''; },
     // \GoatCounter{code}: cookie-free visit counter, dashboard at https://code.goatcounter.com
     GoatCounter: (s) => { site.goatcounter = plainArg(s).trim().toLowerCase().replace(/[^a-z0-9-]/g, ''); return ''; },
+    // \Umami{website id}: cookie-free visit statistics (Umami Cloud). \Umami[script url]{id} for a self-hosted Umami
+    Umami: (s) => {
+      const script = plain(s.opt() || []).trim() || 'https://cloud.umami.is/script.js';
+      site.umami = { id: plainArg(s).trim().replace(/[^a-zA-Z0-9-]/g, ''), script };
+      return '';
+    },
     Social: (s, r) => {
       const icon = plainArg(s);
       const url = plain(s.arg() || []).replace(/\\([#%&_~])/g, '$1');

@@ -207,8 +207,12 @@ export async function build({ dev = false, quiet = false } = {}) {
   const json = JSON.stringify(data).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const stripTags = (h) => String(h || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   // GoatCounter visit counter: only in the published site, never in the local preview
-  const analytics = !dev && data.site.goatcounter
-    ? `<script data-goatcounter="https://${data.site.goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '';
+  // Umami (preferred) or GoatCounter visit statistics: only in the published site, never in the local preview
+  const umami = data.site.umami && data.site.umami.id ? data.site.umami : null;
+  const analytics = dev ? '' : umami
+    ? `<script defer src="${umami.script}" data-website-id="${umami.id}"></script>`
+    : data.site.goatcounter
+      ? `<script data-goatcounter="https://${data.site.goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '';
   const reload = dev ? `<script>new EventSource('${base}__reload').onmessage = () => location.reload();</script>` : '';
 
   // Content-Security-Policy for the published site: the browser only runs this site's own scripts
@@ -217,10 +221,13 @@ export async function build({ dev = false, quiet = false } = {}) {
   const inlineScripts = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => sha(m[1]));
   const originOf = (u) => { try { return new URL(u).origin; } catch { return ''; } };
   const formOrigin = originOf(content.contact.endpoint || '');
-  const counter = data.site.goatcounter ? `https://${data.site.goatcounter}.goatcounter.com` : '';
+  const umamiOrigin = umami ? originOf(umami.script) : '';
+  const counter = umami ? [umamiOrigin, umamiOrigin === 'https://cloud.umami.is' ? 'https://api-gateway.umami.dev' : ''].filter(Boolean).join(' ')
+    : data.site.goatcounter ? `https://${data.site.goatcounter}.goatcounter.com` : '';
+  const counterScript = umami ? umamiOrigin : data.site.goatcounter ? 'https://gc.zgo.at' : '';
   const csp = dev ? '' : [
     "default-src 'self'",
-    ["script-src 'self'", ...inlineScripts, counter && 'https://gc.zgo.at'].filter(Boolean).join(' '),
+    ["script-src 'self'", ...inlineScripts, counterScript].filter(Boolean).join(' '),
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: https:",
