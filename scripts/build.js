@@ -221,8 +221,9 @@ export async function build({ dev = false, quiet = false } = {}) {
   const inlineScripts = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => sha(m[1]));
   const originOf = (u) => { try { return new URL(u).origin; } catch { return ''; } };
   const formOrigin = originOf(content.contact.endpoint || '');
+  // Umami Cloud loads its script from cloud.umami.is and sends the visits to gateway.umami.is
   const umamiOrigin = umami ? originOf(umami.script) : '';
-  const counter = umami ? [umamiOrigin, umamiOrigin === 'https://cloud.umami.is' ? 'https://api-gateway.umami.dev' : ''].filter(Boolean).join(' ')
+  const counter = umami ? [umamiOrigin, umamiOrigin === 'https://cloud.umami.is' ? 'https://gateway.umami.is https://api-gateway.umami.dev' : ''].filter(Boolean).join(' ')
     : data.site.goatcounter ? `https://${data.site.goatcounter}.goatcounter.com` : '';
   const counterScript = umami ? umamiOrigin : data.site.goatcounter ? 'https://gc.zgo.at' : '';
   const csp = dev ? '' : [
