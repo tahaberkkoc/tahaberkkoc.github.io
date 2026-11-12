@@ -209,10 +209,11 @@ export async function build({ dev = false, quiet = false } = {}) {
   // GoatCounter visit counter: only in the published site, never in the local preview
   // Umami (preferred) or GoatCounter visit statistics: only in the published site, never in the local preview
   const umami = data.site.umami && data.site.umami.id ? data.site.umami : null;
-  const analytics = dev ? '' : umami
-    ? `<script defer src="${umami.script}" data-website-id="${umami.id}"></script>`
-    : data.site.goatcounter
-      ? `<script data-goatcounter="https://${data.site.goatcounter}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '';
+  const goat = data.site.goatcounter || '';
+  const analytics = dev ? '' : [
+    umami ? `<script defer src="${umami.script}" data-website-id="${umami.id}"></script>` : '',
+    goat ? `<script data-goatcounter="https://${goat}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>` : '',
+  ].join('');
   const reload = dev ? `<script>new EventSource('${base}__reload').onmessage = () => location.reload();</script>` : '';
 
   // Content-Security-Policy for the published site: the browser only runs this site's own scripts
@@ -223,9 +224,12 @@ export async function build({ dev = false, quiet = false } = {}) {
   const formOrigin = originOf(content.contact.endpoint || '');
   // Umami Cloud loads its script from cloud.umami.is and sends the visits to gateway.umami.is
   const umamiOrigin = umami ? originOf(umami.script) : '';
-  const counter = umami ? [umamiOrigin, umamiOrigin === 'https://cloud.umami.is' ? 'https://gateway.umami.is https://api-gateway.umami.dev' : ''].filter(Boolean).join(' ')
-    : data.site.goatcounter ? `https://${data.site.goatcounter}.goatcounter.com` : '';
-  const counterScript = umami ? umamiOrigin : data.site.goatcounter ? 'https://gc.zgo.at' : '';
+  // Umami and GoatCounter can run side by side
+  const counter = [
+    umami && umamiOrigin, umami && umamiOrigin === 'https://cloud.umami.is' && 'https://gateway.umami.is https://api-gateway.umami.dev',
+    goat && `https://${goat}.goatcounter.com`,
+  ].filter(Boolean).join(' ');
+  const counterScript = [umami && umamiOrigin, goat && 'https://gc.zgo.at'].filter(Boolean).join(' ');
   const csp = dev ? '' : [
     "default-src 'self'",
     ["script-src 'self'", ...inlineScripts, counterScript].filter(Boolean).join(' '),
